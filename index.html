@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shiva &amp; Meena — Wedding Reception</title>
+<meta name="theme-color" content="#2a0a14">
+<!-- Reachable by QR, but kept out of search engines. A wedding invitation
+     with names, date and time should not be indexable. -->
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Shiva &amp; Meena — Wedding Reception">
+<meta property="og:description" content="25 October 2026 · Sunday · 6 PM onwards">
+<meta property="og:image" content="assets/poster.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+<script type="module">
+  // Prefer the vendored copy so the page has no runtime CDN dependency.
+  // Falls back to unpkg only if assets/model-viewer.min.js is missing.
+  import('./assets/model-viewer.min.js').catch(() =>
+    import('https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js'));
+</script>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:radial-gradient(120% 90% at 50% 0%, #3a0f1d 0%, #230a13 45%, #150509 100%);
+    color:#f3e6d2;
+    font-family:"Cormorant Garamond",Georgia,serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  #stage{position:relative;flex:1 1 auto;min-height:0}
+  video#cam{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;display:none;background:#000;
+  }
+  body.camera-on video#cam{display:block}
+  body.camera-on{background:#000}
+  model-viewer{
+    position:absolute;inset:0;width:100%;height:100%;
+    --poster-color:transparent;
+    background-color:transparent;
+    outline:none;
+  }
+  /* ---------- chrome ---------- */
+  header{
+    position:absolute;top:0;left:0;right:0;z-index:3;
+    padding:calc(env(safe-area-inset-top) + 18px) 20px 26px;
+    text-align:center;pointer-events:none;
+    background:linear-gradient(180deg,rgba(10,3,6,.75),transparent);
+    transition:opacity .45s ease;
+  }
+  body.camera-on header{background:linear-gradient(180deg,rgba(0,0,0,.55),transparent)}
+  header .kicker{
+    font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
+    color:#d9b871;opacity:.9;margin:0 0 6px;padding-left:.42em;
+  }
+  header h1{
+    font-family:"Great Vibes",cursive;font-weight:400;
+    font-size:clamp(2.1rem,9vw,3.4rem);line-height:1.05;margin:0;
+    color:#f6e7c8;text-shadow:0 2px 24px rgba(217,184,113,.45);
+  }
+  .rule{
+    width:min(62%,320px);height:1px;margin:14px auto 0;
+    background:linear-gradient(90deg,transparent,#c9a25f,transparent);
+  }
+  footer{
+    position:relative;z-index:3;flex:0 0 auto;
+    padding:16px 18px calc(env(safe-area-inset-bottom) + 18px);
+    text-align:center;
+    background:linear-gradient(0deg,rgba(10,3,6,.92),rgba(10,3,6,.6) 60%,transparent);
+  }
+  .when{font-size:1.02rem;letter-spacing:.1em;color:#e8d3a8;margin:0 0 3px}
+  .when b{font-weight:600;color:#f7e9cc}
+  .venue{font-size:.86rem;letter-spacing:.06em;color:#b99a72;margin:0 0 14px;font-style:italic}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  button,.btn{
+    font-family:inherit;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;
+    padding:12px 20px;border-radius:999px;cursor:pointer;
+    border:1px solid #a8814a;background:rgba(168,129,74,.12);color:#f0dcb6;
+    transition:background .2s ease,transform .12s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  button:active,.btn:active{transform:scale(.97)}
+  button.primary{
+    background:linear-gradient(180deg,#c9a25f,#a17b40);
+    border-color:#d9b871;color:#2a0a14;font-weight:600;
+  }
+  button[hidden]{display:none!important}
+  /* AR prompt + notices */
+  #hint{
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    z-index:4;font-size:.78rem;letter-spacing:.08em;color:#c9a25f;
+    background:rgba(12,4,8,.78);border:1px solid rgba(168,129,74,.35);
+    padding:8px 16px;border-radius:999px;white-space:nowrap;
+    opacity:0;transition:opacity .4s ease;pointer-events:none;
+  }
+  #hint.show{opacity:1}
+  .loader{
+    position:absolute;inset:0;display:grid;place-items:center;z-index:2;
+    color:#c9a25f;font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;
+    transition:opacity .5s ease;
+  }
+  .loader.gone{opacity:0;pointer-events:none}
+  @media (min-width:900px){
+    header h1{font-size:4rem}
+    .when{font-size:1.2rem}
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="cam" playsinline muted autoplay></video>
+
+  <model-viewer
+      id="mv"
+      src="assets/wedding_reception.glb"
+      ios-src="assets/wedding_reception.usdz"
+      poster="assets/poster.jpg"
+      alt="Animated wedding reception invitation for Shiva and Meena"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      ar-scale="auto"
+      ar-placement="wall"
+      autoplay
+      animation-crossfade-duration="0"
+      camera-controls
+      touch-action="pan-y"
+      interaction-prompt="none"
+      shadow-intensity="0"
+      exposure="1.15"
+      environment-image="neutral"
+      min-camera-orbit="auto auto 1.2m"
+      max-camera-orbit="auto auto 8m"
+      camera-orbit="0deg 78deg 4.2m"
+      field-of-view="34deg">
+    <div slot="ar-button" style="display:none"></div>
+    <div slot="poster" class="loader" id="loader">Loading</div>
+  </model-viewer>
+
+  <div id="hint"></div>
+</div>
+
+<header id="chrome">
+  <p class="kicker">With joy, we welcome you</p>
+  <h1>Shiva &amp; Meena</h1>
+  <div class="rule"></div>
+</header>
+
+<footer>
+  <p class="when"><b>Sunday, 25 October 2026</b> · 6 PM onwards</p>
+  <p class="venue">Wedding Reception</p>
+  <div class="btns">
+    <button id="ar" class="primary" hidden>View in your room</button>
+    <button id="camera">Camera mode</button>
+    <button id="replay">Replay</button>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const mv      = document.getElementById('mv');
+  const arBtn   = document.getElementById('ar');
+  const camBtn  = document.getElementById('camera');
+  const replay  = document.getElementById('replay');
+  const video   = document.getElementById('cam');
+  const hint    = document.getElementById('hint');
+  const loader  = document.getElementById('loader');
+  let stream    = null;
+
+  const say = (msg, ms = 3200) => {
+    hint.textContent = msg;
+    hint.classList.add('show');
+    clearTimeout(say._t);
+    if (ms) say._t = setTimeout(() => hint.classList.remove('show'), ms);
+  };
+
+  mv.addEventListener('load', () => {
+    loader && loader.classList.add('gone');
+    mv.currentTime = 0;
+    mv.play && mv.play();
+  });
+
+  // Native AR is offered only when the device actually supports it.
+  mv.addEventListener('ar-status', e => {
+    if (e.detail.status === 'failed') say('Could not start AR on this device');
+  });
+  const showArWhenReady = () => { if (mv.canActivateAR) arBtn.hidden = false; };
+  showArWhenReady();
+  setTimeout(showArWhenReady, 700);
+  setTimeout(showArWhenReady, 2000);
+
+  arBtn.addEventListener('click', () => {
+    stopCamera();
+    try { mv.activateAR(); }
+    catch (err) { say('AR is not available here — try Camera mode'); }
+  });
+
+  replay.addEventListener('click', () => {
+    mv.currentTime = 0;
+    mv.play && mv.play();
+    say('Replaying', 1400);
+  });
+
+  // ---- camera-overlay fallback: works in any browser with a camera ----
+  function stopCamera() {
+    if (!stream) return;
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    video.srcObject = null;
+    document.body.classList.remove('camera-on');
+    camBtn.textContent = 'Camera mode';
+  }
+
+  camBtn.addEventListener('click', async () => {
+    if (stream) { stopCamera(); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      say('This browser has no camera access'); return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }, audio: false
+      });
+      video.srcObject = stream;
+      await video.play();
+      document.body.classList.add('camera-on');
+      camBtn.textContent = 'Close camera';
+      mv.currentTime = 0;
+      mv.play && mv.play();
+      say('Point at a wall, then pinch and drag to place');
+    } catch (err) {
+      stream = null;
+      say(err && err.name === 'NotAllowedError'
+        ? 'Camera permission was declined'
+        : 'Camera unavailable on this device');
+    }
+  });
+
+  window.addEventListener('pagehide', stopCamera);
+})();
+</script>
+</body>
+</html>
