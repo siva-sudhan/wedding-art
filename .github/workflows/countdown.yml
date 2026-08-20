@@ -1,0 +1,32 @@
+name: Update AR countdown
+on:
+  schedule:
+    - cron: "35 18 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: countdown
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --quiet usd-core
+      - run: python3 update_countdown.py
+      - run: python3 update_countdown.py --check
+      - name: Commit if the number moved
+        run: |
+          if [ -z "$(git status --porcelain assets)" ]; then
+            echo "Day count unchanged."; exit 0
+          fi
+          DAYS=$(python3 -c 'import update_countdown as u; print(u.days_left())')
+          git config user.name  "countdown-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets
+          git commit -m "AR countdown: ${DAYS} days to go"
+          git push

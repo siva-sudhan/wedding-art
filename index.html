@@ -352,16 +352,19 @@ if (isIOS || isAndro) arBtn.hidden = false;
 arBtn.addEventListener('click', () => {
   stopCamera();
   const base = location.href.replace(/[^/]*$/, '');
+  // The AR models are rebuilt nightly with a fresh day count, so bust the
+  // cache per-day or phones keep yesterday's number.
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   if (isIOS) {
     const a = document.createElement('a');
     a.rel = 'ar';
-    a.href = 'assets/wedding_reception.usdz';
+    a.href = 'assets/wedding_reception.usdz?d=' + stamp;
     a.appendChild(document.createElement('img'));   // Quick Look requires a child
     document.body.appendChild(a);
     a.click();
     setTimeout(() => a.remove(), 1500);
   } else {
-    const file = encodeURIComponent(base + 'assets/wedding_reception.glb');
+    const file = encodeURIComponent(base + 'assets/wedding_reception.glb?d=' + stamp);
     location.href =
       'intent://arvr.google.com/scene-viewer/1.0?file=' + file +
       '&mode=ar_preferred&title=' + encodeURIComponent('Shiva & Meena') +

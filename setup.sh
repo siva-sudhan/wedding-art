@@ -60,6 +60,15 @@ if [ -f assets/model-viewer.min.js ]; then
 fi
 
 echo
+echo "==> Baking today's day count into the AR models"
+if python3 -c "import pxr" 2>/dev/null; then
+  python3 update_countdown.py || warn "countdown patch failed"
+else
+  warn "usd-core not installed locally — run: pip3 install usd-core"
+  warn "(the nightly GitHub Action does this itself, so deploys stay correct)"
+fi
+
+echo
 echo "==> Checking the models"
 python3 - <<'PY'
 import json, struct, pathlib
