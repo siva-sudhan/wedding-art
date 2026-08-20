@@ -5,146 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shiva &amp; Meena — Wedding Reception</title>
 <meta name="theme-color" content="#2a0a14">
-<!-- Reachable by QR, but kept out of search engines. A wedding invitation
-     with names, date and time should not be indexable. -->
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:title" content="Shiva &amp; Meena — Wedding Reception">
-<meta property="og:description" content="25 October 2026 · Sunday · 6 PM onwards">
+<meta property="og:description" content="Sunday 25 October 2026 · 6 PM onwards">
 <meta property="og:image" content="assets/poster.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
-<script type="module">
-  // Prefer the vendored copy so the page has no runtime CDN dependency.
-  // Falls back to unpkg only if assets/model-viewer.min.js is missing.
-  import('./assets/model-viewer.min.js').catch(() =>
-    import('https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js'));
-</script>
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{
     background:radial-gradient(120% 90% at 50% 0%, #3a0f1d 0%, #230a13 45%, #150509 100%);
-    color:#f3e6d2;
-    font-family:"Cormorant Garamond",Georgia,serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;flex-direction:column;
-    overflow:hidden;
+    color:#f3e6d2;font-family:"Cormorant Garamond",Georgia,serif;
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden;
   }
   #stage{position:relative;flex:1 1 auto;min-height:0}
-  video#cam{
-    position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;display:none;background:#000;
-  }
+  video#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#000}
   body.camera-on video#cam{display:block}
   body.camera-on{background:#000}
-  model-viewer{
-    position:absolute;inset:0;width:100%;height:100%;
-    --poster-color:transparent;
-    background-color:transparent;
-    outline:none;
-  }
-  /* ---------- chrome ---------- */
+  canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
   header{
     position:absolute;top:0;left:0;right:0;z-index:3;
-    padding:calc(env(safe-area-inset-top) + 18px) 20px 26px;
-    text-align:center;pointer-events:none;
+    padding:calc(env(safe-area-inset-top) + 18px) 20px 26px;text-align:center;pointer-events:none;
     background:linear-gradient(180deg,rgba(10,3,6,.75),transparent);
-    transition:opacity .45s ease;
   }
   body.camera-on header{background:linear-gradient(180deg,rgba(0,0,0,.55),transparent)}
-  header .kicker{
-    font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
-    color:#d9b871;opacity:.9;margin:0 0 6px;padding-left:.42em;
-  }
-  header h1{
-    font-family:"Great Vibes",cursive;font-weight:400;
-    font-size:clamp(2.1rem,9vw,3.4rem);line-height:1.05;margin:0;
-    color:#f6e7c8;text-shadow:0 2px 24px rgba(217,184,113,.45);
-  }
-  .rule{
-    width:min(62%,320px);height:1px;margin:14px auto 0;
-    background:linear-gradient(90deg,transparent,#c9a25f,transparent);
-  }
+  header .kicker{font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;color:#d9b871;opacity:.9;margin:0 0 6px;padding-left:.42em}
+  header h1{font-family:"Great Vibes",cursive;font-weight:400;font-size:clamp(2.1rem,9vw,3.4rem);line-height:1.05;margin:0;color:#f6e7c8;text-shadow:0 2px 24px rgba(217,184,113,.45)}
+  .rule{width:min(62%,320px);height:1px;margin:14px auto 0;background:linear-gradient(90deg,transparent,#c9a25f,transparent)}
   footer{
     position:relative;z-index:3;flex:0 0 auto;
-    padding:16px 18px calc(env(safe-area-inset-bottom) + 18px);
-    text-align:center;
+    padding:16px 18px calc(env(safe-area-inset-bottom) + 18px);text-align:center;
     background:linear-gradient(0deg,rgba(10,3,6,.92),rgba(10,3,6,.6) 60%,transparent);
   }
   .when{font-size:1.02rem;letter-spacing:.1em;color:#e8d3a8;margin:0 0 3px}
   .when b{font-weight:600;color:#f7e9cc}
   .venue{font-size:.86rem;letter-spacing:.06em;color:#b99a72;margin:0 0 14px;font-style:italic}
   .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  button,.btn{
+  button{
     font-family:inherit;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;
     padding:12px 20px;border-radius:999px;cursor:pointer;
     border:1px solid #a8814a;background:rgba(168,129,74,.12);color:#f0dcb6;
-    transition:background .2s ease,transform .12s ease;
-    -webkit-tap-highlight-color:transparent;
+    transition:background .2s ease,transform .12s ease;-webkit-tap-highlight-color:transparent;
   }
-  button:active,.btn:active{transform:scale(.97)}
-  button.primary{
-    background:linear-gradient(180deg,#c9a25f,#a17b40);
-    border-color:#d9b871;color:#2a0a14;font-weight:600;
-  }
+  button:active{transform:scale(.97)}
+  button.primary{background:linear-gradient(180deg,#c9a25f,#a17b40);border-color:#d9b871;color:#2a0a14;font-weight:600}
   button[hidden]{display:none!important}
-  /* AR prompt + notices */
   #hint{
-    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
-    z-index:4;font-size:.78rem;letter-spacing:.08em;color:#c9a25f;
-    background:rgba(12,4,8,.78);border:1px solid rgba(168,129,74,.35);
-    padding:8px 16px;border-radius:999px;white-space:nowrap;
-    opacity:0;transition:opacity .4s ease;pointer-events:none;
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;
+    font-size:.78rem;letter-spacing:.08em;color:#c9a25f;background:rgba(12,4,8,.78);
+    border:1px solid rgba(168,129,74,.35);padding:8px 16px;border-radius:999px;
+    white-space:nowrap;opacity:0;transition:opacity .4s ease;pointer-events:none;max-width:92vw;
   }
   #hint.show{opacity:1}
   .loader{
-    position:absolute;inset:0;display:grid;place-items:center;z-index:2;
-    color:#c9a25f;font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;
-    transition:opacity .5s ease;
+    position:absolute;inset:0;display:grid;place-items:center;z-index:2;color:#c9a25f;
+    font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;transition:opacity .5s ease;
+    text-align:center;padding:20px;
   }
   .loader.gone{opacity:0;pointer-events:none}
-  @media (min-width:900px){
-    header h1{font-size:4rem}
-    .when{font-size:1.2rem}
-  }
+  .loader small{display:block;margin-top:10px;letter-spacing:.06em;text-transform:none;font-size:.85rem;color:#8d6f4e}
+  @media (min-width:900px){header h1{font-size:4rem}.when{font-size:1.2rem}}
 </style>
 </head>
 <body>
 
 <div id="stage">
   <video id="cam" playsinline muted autoplay></video>
-
-  <model-viewer
-      id="mv"
-      src="assets/wedding_reception.glb"
-      ios-src="assets/wedding_reception.usdz"
-      poster="assets/poster.jpg"
-      alt="Animated wedding reception invitation for Shiva and Meena"
-      ar
-      ar-modes="webxr scene-viewer quick-look"
-      ar-scale="auto"
-      ar-placement="wall"
-      autoplay
-      animation-crossfade-duration="0"
-      camera-controls
-      touch-action="pan-y"
-      interaction-prompt="none"
-      shadow-intensity="0"
-      exposure="1.15"
-      environment-image="neutral"
-      min-camera-orbit="auto auto 1.2m"
-      max-camera-orbit="auto auto 8m"
-      camera-orbit="0deg 78deg 4.2m"
-      field-of-view="34deg">
-    <div slot="ar-button" style="display:none"></div>
-    <div slot="poster" class="loader" id="loader">Loading</div>
-  </model-viewer>
-
+  <canvas id="gl"></canvas>
+  <div class="loader" id="loader">Loading</div>
   <div id="hint"></div>
 </div>
 
-<header id="chrome">
+<header>
   <p class="kicker">With joy, we welcome you</p>
   <h1>Shiva &amp; Meena</h1>
   <div class="rule"></div>
@@ -160,87 +94,319 @@
   </div>
 </footer>
 
-<script>
-(function () {
-  const mv      = document.getElementById('mv');
-  const arBtn   = document.getElementById('ar');
-  const camBtn  = document.getElementById('camera');
-  const replay  = document.getElementById('replay');
-  const video   = document.getElementById('cam');
-  const hint    = document.getElementById('hint');
-  const loader  = document.getElementById('loader');
-  let stream    = null;
+<script type="importmap">
+{ "imports": { "three": "./assets/three/three.module.js" } }
+</script>
 
-  const say = (msg, ms = 3200) => {
-    hint.textContent = msg;
-    hint.classList.add('show');
-    clearTimeout(say._t);
-    if (ms) say._t = setTimeout(() => hint.classList.remove('show'), ms);
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader }      from './assets/three/loaders/GLTFLoader.js';
+import { OrbitControls }   from './assets/three/controls/OrbitControls.js';
+import { RoomEnvironment } from './assets/three/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+const loaderEl = $('loader'), hintEl = $('hint');
+const say = (m, ms = 3600) => {
+  hintEl.textContent = m; hintEl.classList.add('show');
+  clearTimeout(say._t); if (ms) say._t = setTimeout(() => hintEl.classList.remove('show'), ms);
+};
+const fail = m => { loaderEl.classList.remove('gone');
+  loaderEl.innerHTML = 'Unable to load<small>' + m + '</small>'; };
+
+// ---------------------------------------------------------------- renderer
+const canvas   = $('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.outputColorSpace   = THREE.SRGBColorSpace;
+renderer.toneMapping        = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 200);
+camera.position.set(0, 0.05, 2.3);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const key = new THREE.DirectionalLight(0xfff2dd, 2.1); key.position.set(1.2, 1.4, 2.2);
+const rim = new THREE.DirectionalLight(0xffd9a0, 1.2); rim.position.set(-1.5, 0.6, -1.8);
+scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.35));
+
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0.05, 0);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.enablePan = false;
+controls.minDistance = 0.8; controls.maxDistance = 7;
+controls.update();
+
+function resize() {
+  const r = canvas.parentElement.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width / Math.max(r.height, 1);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+// ------------------------------------------------------------ countdown 3D
+// Sunday 25 October 2026, 18:00 IST == 12:30 UTC
+const TARGET = Date.UTC(2026, 9, 25, 12, 30, 0);
+const S       = 1.1;             // scale of the countdown row
+const PITCH   = 0.0268 * S;      // monospace advance, measured in Blender
+const DIGIT_Y = 0.013;           // world-aligned, relative to the row centre
+const LABEL_Y = -0.021;
+// Two digits everywhere: the reception is 66 days out at most, and the count
+// only falls from here, so a hundreds place would never be anything but zero.
+const UNITS  = [['DAYS', 2], ['HRS', 2], ['MIN', 2], ['SEC', 2]];
+const FPS      = 30;
+const FIRE_IN  = 130;   // first shell launches
+const FIRE_OUT = 300;   // last spark dies
+const REVEAL_MS = 5200; // lettering settles, countdown appears
+
+let mixer = null, textAction = null, fireAction = null;
+let cdGroup = null, slots = [], digitGeo = {}, revealAt = 0;
+
+function remaining() {
+  let ms = TARGET - Date.now();
+  const past = ms <= 0; ms = Math.abs(ms);
+  const s = Math.floor(ms / 1000);
+  return { past, DAYS: Math.floor(s / 86400), HRS: Math.floor(s / 3600) % 24,
+           MIN: Math.floor(s / 60) % 60, SEC: s % 60 };
+}
+
+function buildCountdown(root, lib) {
+  // Place it relative to the real "SUNDAY 6 PM ONWARDS" line rather than
+  // assuming an axis convention. Blender's root rotation and glTF's Y-up
+  // conversion do NOT cancel, so hard-coded local coords land in the wrong
+  // plane. Measured at the fully-revealed pose so scales are final.
+  const refs = [];
+  root.traverse(o => { if (o.isMesh && /^L5_/.test(o.name)) refs.push(o); });
+  if (!refs.length) throw new Error('reference line L5_ not found');
+  const box = new THREE.Box3();
+  refs.forEach(m => box.expandByObject(m));
+  const mid = box.getCenter(new THREE.Vector3());
+
+  // The group stays world-aligned so layout offsets mean what they say.
+  // The glyph geometry is authored in Blender's object space, so the rotation
+  // goes on each mesh instead. Rotating the group would push the vertical
+  // offsets along depth rather than height.
+  const glyphQ = new THREE.Quaternion();
+  refs[0].getWorldQuaternion(glyphQ);
+
+  cdGroup = new THREE.Group();
+  cdGroup.position.set(mid.x, box.min.y - 0.065, mid.z);
+  root.add(cdGroup);
+
+  for (let d = 0; d < 10; d++) {
+    const m = lib['DIGIT_' + d];
+    if (m) digitGeo[d] = m.geometry;
+  }
+  const gold = lib['DIGIT_0'] && lib['DIGIT_0'].material;
+  if (!gold || !digitGeo[0]) throw new Error('digit library missing from model');
+
+  const place = (geo, mat, x, y) => {
+    const m = new THREE.Mesh(geo, mat);
+    m.quaternion.copy(glyphQ);
+    m.position.set(x, y, 0);
+    m.scale.setScalar(S);
+    cdGroup.add(m);
+    return m;
   };
 
-  mv.addEventListener('load', () => {
-    loader && loader.classList.add('gone');
-    mv.currentTime = 0;
-    mv.play && mv.play();
+  const spanOf = o => { const b = new THREE.Box3().setFromObject(o);
+                        return b.max.x - b.min.x; };
+  const widths = UNITS.map(([label, n]) => {
+    const lm = lib['LBL_' + label];
+    return Math.max(n * PITCH, lm ? spanOf(lm) * S : 0);
+  });
+  const gap   = 0.030;
+  const total = widths.reduce((a, b) => a + b, 0) + gap * (UNITS.length - 1);
+  let x = -total / 2;
+
+  UNITS.forEach(([label, n], gi) => {
+    const w = widths[gi];
+    const group = [];
+    const dx0 = x + w / 2 - (n * PITCH) / 2;
+    for (let i = 0; i < n; i++) {
+      group.push(place(digitGeo[0], gold, dx0 + PITCH * (i + 0.5), DIGIT_Y));
+    }
+    const lm = lib['LBL_' + label];
+    if (lm) place(lm.geometry, lm.material, x + w / 2, LABEL_Y);
+    slots.push({ key: label, meshes: group });
+    x += w + gap;
+  });
+  cdGroup.scale.setScalar(0.0001);
+  tickCountdown();
+}
+
+function tickCountdown() {
+  if (!slots.length) return;
+  const r = remaining();
+  slots.forEach(({ key, meshes }) => {
+    // Clamp rather than truncate: slicing 100 down to two digits would show
+    // "00", which reads as arrived. Capping shows 99 — wrong, but obviously so.
+    const cap = Math.pow(10, meshes.length) - 1;
+    const str = String(Math.min(r[key], cap)).padStart(meshes.length, '0');
+    meshes.forEach((m, i) => {
+      const g = digitGeo[+str[i]];
+      if (g && m.geometry !== g) m.geometry = g;
+    });
+  });
+}
+
+// -------------------------------------------------------------- load model
+new GLTFLoader().load('assets/wedding_reception_viewer.glb?v=3', gltf => {
+  scene.add(gltf.scene);
+
+  const lib = {};
+  gltf.scene.traverse(o => {
+    if (o.isMesh && (/^DIGIT_\d$/.test(o.name) || /^LBL_/.test(o.name))) {
+      lib[o.name] = o;
+      o.visible = false;              // originals are a parts bin, never drawn
+    }
   });
 
-  // Native AR is offered only when the device actually supports it.
-  mv.addEventListener('ar-status', e => {
-    if (e.detail.status === 'failed') say('Could not start AR on this device');
-  });
-  const showArWhenReady = () => { if (mv.canActivateAR) arBtn.hidden = false; };
-  showArWhenReady();
-  setTimeout(showArWhenReady, 700);
-  setTimeout(showArWhenReady, 2000);
+  // One baked clip drives everything. Split it by track name so the lettering
+  // can play once and hold, while the fireworks loop on their own.
+  const clip = gltf.animations && gltf.animations[0];
+  if (clip) {
+    mixer = new THREE.AnimationMixer(gltf.scene);
+    const isSpark = t => /^(SPK_|SHELL_)/.test(t.name);
+    const textTracks = clip.tracks.filter(t => !isSpark(t));
+    const fireTracks = clip.tracks.filter(t => isSpark(t));
 
-  arBtn.addEventListener('click', () => {
-    stopCamera();
-    try { mv.activateAR(); }
-    catch (err) { say('AR is not available here — try Camera mode'); }
-  });
+    textAction = mixer.clipAction(
+      new THREE.AnimationClip('text', clip.duration, textTracks));
+    textAction.setLoop(THREE.LoopOnce, 1);
+    textAction.clampWhenFinished = true;      // freeze fully revealed
+    textAction.play();
 
-  replay.addEventListener('click', () => {
-    mv.currentTime = 0;
-    mv.play && mv.play();
-    say('Replaying', 1400);
-  });
-
-  // ---- camera-overlay fallback: works in any browser with a camera ----
-  function stopCamera() {
-    if (!stream) return;
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
-    video.srcObject = null;
-    document.body.classList.remove('camera-on');
-    camBtn.textContent = 'Camera mode';
+    if (fireTracks.length) {
+      // re-based to 0 so the loop is bursts only, no dead lead-in
+      const full = new THREE.AnimationClip('fireFull', clip.duration, fireTracks);
+      const sub  = THREE.AnimationUtils.subclip(full, 'fire', FIRE_IN, FIRE_OUT, FPS);
+      fireAction = mixer.clipAction(sub);
+      fireAction.setLoop(THREE.LoopRepeat, Infinity);
+      fireAction.play();
+    }
   }
 
-  camBtn.addEventListener('click', async () => {
-    if (stream) { stopCamera(); return; }
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      say('This browser has no camera access'); return;
-    }
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } }, audio: false
-      });
-      video.srcObject = stream;
-      await video.play();
-      document.body.classList.add('camera-on');
-      camBtn.textContent = 'Close camera';
-      mv.currentTime = 0;
-      mv.play && mv.play();
-      say('Point at a wall, then pinch and drag to place');
-    } catch (err) {
-      stream = null;
-      say(err && err.name === 'NotAllowedError'
-        ? 'Camera permission was declined'
-        : 'Camera unavailable on this device');
-    }
-  });
+  // Measure at the fully-revealed pose, or the text is still scaled to nothing.
+  if (mixer) { mixer.setTime(clip.duration); gltf.scene.updateMatrixWorld(true); }
+  try { buildCountdown(gltf.scene, lib); }
+  catch (e) { console.warn('[countdown]', e.message); say('Countdown unavailable'); }
+  if (mixer) {
+    mixer.setTime(0);
+    if (textAction) { textAction.reset(); textAction.play(); }
+    if (fireAction) { fireAction.reset(); fireAction.play(); }
+  }
 
-  window.addEventListener('pagehide', stopCamera);
-})();
+  revealAt = performance.now() + REVEAL_MS;
+  loaderEl.classList.add('gone');
+}, undefined, err => fail((err && err.message) || 'the 3D scene could not be fetched'));
+
+// ------------------------------------------------------------------- loop
+const clock = new THREE.Clock();
+let lastSec = -1, frames = 0;
+
+// Debug handle — harmless, and makes the scene inspectable from the console.
+window.__wed = { THREE, scene, camera, renderer, controls,
+  get frames() { return frames; },
+  get mixer() { return mixer; },
+  get action() { return textAction; },
+  get textAction() { return textAction; },
+  get fireAction() { return fireAction; },
+  get cdGroup() { return cdGroup; },
+  bbox() {
+    const b = new THREE.Box3().setFromObject(scene);
+    return b.isEmpty() ? 'empty' : { min: b.min.toArray().map(n=>+n.toFixed(3)),
+                                     max: b.max.toArray().map(n=>+n.toFixed(3)) };
+  } };
+
+renderer.setAnimationLoop(() => {
+  frames++;
+  const dt = clock.getDelta();
+  if (mixer) mixer.update(dt);
+
+  // Countdown eases in once the lettering has settled, then stays put.
+  // Driven by wall clock, not clip time — the text action clamps and stops,
+  // so its .time would freeze and never cross the threshold.
+  if (cdGroup && revealAt) {
+    const k = Math.min(Math.max((performance.now() - revealAt) / 600, 0), 1);
+    cdGroup.scale.setScalar(Math.max(k * k * (3 - 2 * k), 0.0001));
+  }
+  const s = Math.floor(Date.now() / 1000);
+  if (s !== lastSec) { lastSec = s; tickCountdown(); }
+
+  controls.update();
+  renderer.render(scene, camera);
+});
+
+// --------------------------------------------------------------- AR launch
+const UA      = navigator.userAgent;
+const isIOS   = /iPad|iPhone|iPod/.test(UA) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndro = /Android/.test(UA);
+const arBtn   = $('ar');
+if (isIOS || isAndro) arBtn.hidden = false;
+
+arBtn.addEventListener('click', () => {
+  stopCamera();
+  const base = location.href.replace(/[^/]*$/, '');
+  if (isIOS) {
+    const a = document.createElement('a');
+    a.rel = 'ar';
+    a.href = 'assets/wedding_reception.usdz';
+    a.appendChild(document.createElement('img'));   // Quick Look requires a child
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 1500);
+  } else {
+    const file = encodeURIComponent(base + 'assets/wedding_reception.glb');
+    location.href =
+      'intent://arvr.google.com/scene-viewer/1.0?file=' + file +
+      '&mode=ar_preferred&title=' + encodeURIComponent('Shiva & Meena') +
+      '#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;' +
+      'S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end;';
+  }
+});
+
+// ------------------------------------------------------------ camera mode
+const video = $('cam');
+let stream = null;
+function stopCamera() {
+  if (!stream) return;
+  stream.getTracks().forEach(t => t.stop());
+  stream = null; video.srcObject = null;
+  document.body.classList.remove('camera-on');
+  $('camera').textContent = 'Camera mode';
+}
+$('camera').addEventListener('click', async () => {
+  if (stream) { stopCamera(); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return say('This browser has no camera access');
+  }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } }, audio: false });
+    video.srcObject = stream; await video.play();
+    document.body.classList.add('camera-on');
+    $('camera').textContent = 'Close camera';
+    say('Drag to turn · pinch to resize');
+  } catch (e) {
+    stream = null;
+    say(e && e.name === 'NotAllowedError'
+      ? 'Camera permission was declined' : 'Camera unavailable');
+  }
+});
+addEventListener('pagehide', stopCamera);
+
+$('replay').addEventListener('click', () => {
+  if (textAction) { textAction.reset(); textAction.play(); }
+  if (fireAction) { fireAction.reset(); fireAction.play(); }
+  if (cdGroup) cdGroup.scale.setScalar(0.0001);
+  revealAt = performance.now() + REVEAL_MS;
+  say('Replaying', 1400);
+});
 </script>
 </body>
 </html>
