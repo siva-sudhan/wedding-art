@@ -158,8 +158,8 @@ const LABEL_Y = -0.021;
 // only falls from here, so a hundreds place would never be anything but zero.
 const UNITS  = [['DAYS', 2], ['HRS', 2], ['MIN', 2], ['SEC', 2]];
 const FPS      = 30;
-const FIRE_IN  = 130;   // first shell launches
-const FIRE_OUT = 300;   // last spark dies
+const FIRE_IN  = 154;   // lettering is fully settled by here
+const FIRE_OUT = 322;   // last spark dies — same window the AR build loops
 const REVEAL_MS = 5200; // lettering settles, countdown appears
 
 let mixer = null, textAction = null, fireAction = null;
@@ -254,7 +254,7 @@ function tickCountdown() {
 }
 
 // -------------------------------------------------------------- load model
-new GLTFLoader().load('assets/wedding_reception_viewer.glb?v=3', gltf => {
+new GLTFLoader().load('assets/wedding_reception_viewer.glb?v=4', gltf => {
   scene.add(gltf.scene);
 
   const lib = {};
