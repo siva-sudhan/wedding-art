@@ -1,15 +1,26 @@
-name: Update AR countdown
+name: Deploy invitation
+
+# Patches the AR day count at deploy time instead of committing the binaries.
+# Keeps ~9 MB of models out of git history on every run.
+
 on:
+  push:
+    branches: [main]
   schedule:
-    - cron: "35 18 * * *"
+    - cron: "35 18 * * *"      # 00:05 IST, just after the day rolls over
   workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
-  group: countdown
+  group: pages
   cancel-in-progress: false
+
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,14 +30,16 @@ jobs:
       - run: pip install --quiet usd-core
       - run: python3 update_countdown.py
       - run: python3 update_countdown.py --check
-      - name: Commit if the number moved
-        run: |
-          if [ -z "$(git status --porcelain assets)" ]; then
-            echo "Day count unchanged."; exit 0
-          fi
-          DAYS=$(python3 -c 'import update_countdown as u; print(u.days_left())')
-          git config user.name  "countdown-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets
-          git commit -m "AR countdown: ${DAYS} days to go"
-          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
