@@ -66,10 +66,156 @@
   }
   .loader.gone{opacity:0;pointer-events:none}
   .loader small{display:block;margin-top:10px;letter-spacing:.06em;text-transform:none;font-size:.85rem;color:#8d6f4e}
+  /* ------------------------------------------------- invitation intro */
+  body.intro-on header,
+  body.intro-on footer{opacity:0;transition:opacity .9s ease}
+  header,footer{transition:opacity .9s ease .5s}
+
+  #intro{
+    position:fixed;inset:0;z-index:20;overflow:hidden;
+    transition:opacity .5s ease;
+  }
+  #intro.done{opacity:0;pointer-events:none}
+  #intro.gone{display:none}
+
+  /* The opaque ground the card sits on. It dissolves while the leaves are
+     still sweeping, so the curtains really do part over the live 3D scene
+     instead of over a flat panel that fades out afterwards. */
+  .bg{
+    position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 42%, #4a162899 0%, #170610 62%, #0d0307 100%),#0d0307;
+    transition:opacity 1.1s ease .3s;
+  }
+  #intro.opening .bg{opacity:0}
+
+  /* banana-leaf curtains — sized by width so a phone doesn't get a wall of
+     leaf; cover crops the fanned tips inward and keeps the stems on the edge */
+  .leaf{
+    position:absolute;top:0;bottom:0;width:min(40vw,320px);
+    pointer-events:none;user-select:none;will-change:transform;
+    transition:transform 1.7s cubic-bezier(.62,.02,.2,1);
+  }
+  .leaf img{width:100%;height:100%;object-fit:cover;display:block;
+            filter:drop-shadow(0 0 40px rgba(0,0,0,.5))}
+  .leaf-l{left:0}
+  .leaf-l img{object-position:left center}
+  .leaf-r{right:0}
+  .leaf-r img{object-position:right center}
+  #intro.parted .leaf-l{transform:translateX(-106%)}
+  #intro.parted .leaf-r{transform:translateX(106%)}
+
+  /* darkens the middle so the card reads against the foliage */
+  .veil{
+    position:absolute;inset:0;pointer-events:none;transition:opacity .9s ease;
+    background:radial-gradient(56% 40% at 50% 47%,
+      rgba(9,3,6,.93) 0%, rgba(9,3,6,.82) 46%, rgba(9,3,6,.28) 76%, rgba(9,3,6,0) 100%);
+  }
+  #intro.opening .veil{opacity:0}
+
+  /* invitation card */
+  .env-wrap{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(58vw,264px);perspective:1400px;
+    transition:transform 1.1s cubic-bezier(.5,0,.2,1),opacity .8s ease .3s;
+  }
+  #intro.opening .env-wrap{transform:translate(-50%,-50%) scale(1.9);opacity:0}
+  .env{position:relative;width:100%;aspect-ratio:2/3;transform-style:preserve-3d}
+  .env-art,.env-inside,.env-flap{position:absolute;inset:0;border-radius:7px}
+  .env-art{
+    background:url("assets/card.jpg") center/cover no-repeat,#2b0c17;
+    box-shadow:0 34px 74px rgba(0,0,0,.62),0 0 0 1px rgba(201,162,95,.35);
+  }
+  .env-inside{
+    clip-path:polygon(0 0,100% 0,50% 54%);
+    background:linear-gradient(180deg,#1a0710 0%,#2e0e1a 100%);
+    box-shadow:inset 0 6px 18px rgba(0,0,0,.65);
+  }
+  .env-flap{
+    clip-path:polygon(0 0,100% 0,50% 54%);
+    background:url("assets/card.jpg") center/cover no-repeat,#2b0c17;
+    transform-origin:top center;backface-visibility:hidden;
+    transition:transform 1.05s cubic-bezier(.58,0,.24,1);
+    filter:drop-shadow(0 8px 12px rgba(0,0,0,.5));
+  }
+  #intro.opening .env-flap{transform:rotateX(-174deg)}
+
+  /* The flap's reverse: plain paper, always 180° behind the front, so the
+     flap stays two-sided instead of blinking out as it passes edge-on. */
+  .env-flap-back{
+    position:absolute;inset:0;border-radius:7px;
+    clip-path:polygon(0 0,100% 0,50% 54%);
+    background:linear-gradient(180deg,#3b1322 0%,#280b16 100%);
+    box-shadow:inset 0 -8px 20px rgba(0,0,0,.5);
+    transform-origin:top center;backface-visibility:hidden;
+    transform:rotateX(180deg);
+    transition:transform 1.05s cubic-bezier(.58,0,.24,1);
+  }
+  #intro.opening .env-flap-back{transform:rotateX(6deg)}
+
+  /* wax seal — the click target */
+  .seal{
+    position:absolute;left:50%;top:54%;width:38%;aspect-ratio:1;
+    transform:translate(-50%,-50%);z-index:3;
+    border:0;padding:0;background:none;border-radius:50%;cursor:pointer;
+    animation:sealPulse 2s ease-in-out infinite;
+  }
+  .seal img{width:100%;display:block}
+  @keyframes sealPulse{
+    0%,100%{transform:translate(-50%,-50%) scale(1);
+            filter:drop-shadow(0 3px 10px rgba(0,0,0,.6)) drop-shadow(0 0 0 rgba(224,192,120,0))}
+    50%    {transform:translate(-50%,-50%) scale(1.07);
+            filter:drop-shadow(0 3px 10px rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(224,192,120,.85))}
+  }
+  #intro.opening .seal{animation:none;opacity:0;transition:opacity .3s ease}
+
+  .tap{
+    /* half the card's height (card is 2:3, so height = 1.5 × width) + a gap */
+    position:absolute;left:50%;top:calc(50% + min(43.5vw,198px) + 26px);
+    transform:translateX(-50%);z-index:2;
+    font-size:.74rem;letter-spacing:.34em;text-transform:uppercase;color:#e0c078;
+    text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 22px rgba(0,0,0,.75);
+    white-space:nowrap;animation:tapFade 2s ease-in-out infinite;pointer-events:none;
+  }
+  @keyframes tapFade{0%,100%{opacity:.45}50%{opacity:1}}
+  #intro.opening .tap{opacity:0;animation:none;transition:opacity .3s ease}
+
+  #skip{
+    position:absolute;right:16px;top:calc(env(safe-area-inset-top) + 16px);z-index:4;
+    padding:8px 16px;font-size:.68rem;letter-spacing:.2em;
+    border-color:rgba(168,129,74,.4);background:rgba(12,4,8,.5);color:#b99a72;
+  }
+  #intro.opening #skip{opacity:0;pointer-events:none;transition:opacity .3s ease}
+
+  @media (prefers-reduced-motion:reduce){
+    .seal,.tap{animation:none}
+    .leaf,.env-wrap,.env-flap{transition-duration:.35s}
+  }
   @media (min-width:900px){header h1{font-size:4rem}.when{font-size:1.2rem}}
 </style>
 </head>
-<body>
+<body class="intro-on">
+
+<div id="intro">
+  <div class="bg"></div>
+  <div class="leaf leaf-l"><img src="assets/leaf-left.png" alt=""></div>
+  <div class="leaf leaf-r"><img src="assets/leaf-right.png" alt=""></div>
+  <div class="veil"></div>
+
+  <div class="env-wrap">
+    <div class="env">
+      <div class="env-art"></div>
+      <div class="env-inside"></div>
+      <div class="env-flap"></div>
+      <div class="env-flap-back"></div>
+      <button class="seal" id="seal" aria-label="Open the invitation">
+        <img src="assets/seal.png" alt="">
+      </button>
+    </div>
+  </div>
+
+  <p class="tap">Tap the seal</p>
+  <button id="skip">Skip</button>
+</div>
 
 <div id="stage">
   <video id="cam" playsinline muted autoplay></video>
@@ -164,6 +310,7 @@ const REVEAL_MS = 5200; // lettering settles, countdown appears
 
 let mixer = null, textAction = null, fireAction = null;
 let cdGroup = null, slots = [], digitGeo = {}, revealAt = 0;
+let sceneReady = false, replayOnLoad = false;
 
 function remaining() {
   let ms = TARGET - Date.now();
@@ -302,6 +449,11 @@ new GLTFLoader().load('assets/wedding_reception_viewer.glb?v=4', gltf => {
 
   revealAt = performance.now() + REVEAL_MS;
   loaderEl.classList.add('gone');
+
+  sceneReady = true;
+  // The card was already opened while this was still downloading — start the
+  // reveal now so the guest doesn't stare at an empty stage.
+  if (replayOnLoad) { replayOnLoad = false; replayScene(); }
 }, undefined, err => fail((err && err.message) || 'the 3D scene could not be fetched'));
 
 // ------------------------------------------------------------------- loop
@@ -403,12 +555,41 @@ $('camera').addEventListener('click', async () => {
 });
 addEventListener('pagehide', stopCamera);
 
-$('replay').addEventListener('click', () => {
+function replayScene() {
   if (textAction) { textAction.reset(); textAction.play(); }
   if (fireAction) { fireAction.reset(); fireAction.play(); }
   if (cdGroup) cdGroup.scale.setScalar(0.0001);
   revealAt = performance.now() + REVEAL_MS;
-  say('Replaying', 1400);
+}
+
+$('replay').addEventListener('click', () => { replayScene(); say('Replaying', 1400); });
+
+// ------------------------------------------------------- invitation intro
+// The card holds the screen while the model streams in behind it, so the
+// 3D reveal is restarted at the moment the flap opens rather than on load —
+// otherwise the lettering has already settled by the time anyone looks.
+const intro = $('intro');
+let opened = false;
+
+function openInvitation() {
+  if (opened) return;
+  opened = true;
+  intro.classList.add('opening');                       // flap swings, card recedes
+  setTimeout(() => intro.classList.add('parted'), 380); // leaves sweep aside
+  setTimeout(() => {
+    document.body.classList.remove('intro-on');         // header and footer fade in
+    if (sceneReady) replayScene(); else replayOnLoad = true;
+  }, 700);
+  // Held until the leaves have cleared the frame (380 + 1700 sweep).
+  setTimeout(() => intro.classList.add('done'), 2300);
+  setTimeout(() => intro.classList.add('gone'), 2900);
+}
+
+$('seal').addEventListener('click', openInvitation);
+$('skip').addEventListener('click', openInvitation);
+// Enter/Space already fire click on a <button>; this adds the rest of the card.
+$('intro').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openInvitation(); }
 });
 </script>
 </body>
