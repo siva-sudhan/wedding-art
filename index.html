@@ -29,19 +29,29 @@
      pushed file then renders as nothing at all, instead of parking a broken-
      image icon in the middle of a wedding invitation. */
   .edge{
-    position:fixed;top:0;height:100svh;z-index:0;
-    width:min(24vw,290px);pointer-events:none;user-select:none;
-    background-size:cover;background-position:50% 50%;background-repeat:no-repeat;
+    position:fixed;top:50%;transform:translateY(-50%);z-index:0;
+    width:min(26vw,300px);aspect-ratio:585/1383;max-height:92svh;
+    pointer-events:none;user-select:none;
+    /* contain, not cover: the garland is 585x1383 and this box is narrower
+       than that in proportion, so cover was scaling to fill the height and
+       throwing away about a quarter of the artwork's width. contain fits the
+       whole thing in and letterboxes instead, which is what you want when the
+       image IS the decoration. */
+    background-size:contain;background-position:50% 50%;background-repeat:no-repeat;
     opacity:.34;filter:saturate(.86) brightness(.72);
     /* the garland has to run off the top and bottom of the screen rather than
        stop on a straight line; the fade lives here because a quantised PNG
        can't carry a soft alpha edge of its own */
-    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);
-            mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);
+    /* The box carries the artwork's own 585:1383 ratio, so it is filled edge
+       to edge and these percentages land on the garland's real top and bottom.
+       Sized any other way the image floats inside the box, the fade lands in
+       the empty part, and the artwork ends on a hard line at half opacity. */
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 82%,transparent 100%);
+            mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 82%,transparent 100%);
   }
   .edge-l{left:-3%;background-image:url("assets/flower-left.png")}
   .edge-r{right:-3%;background-image:url("assets/flower-right.png")}
-  @media (max-width:760px){ .edge{width:36vw;opacity:.2} }
+  @media (max-width:760px){ .edge{width:42vw;opacity:.2} }
 
   /* ---------------------------------------------------------------- hero */
   #hero{
@@ -72,9 +82,11 @@
   button[hidden]{display:none!important}
 
   /* The dot the story starts from — the head of the road, at rest. */
+  /* column-reverse: the word reads above the dot, so the road can leave the
+     seed heading straight down without the lettering sitting on the line. */
   #start{
-    margin-top:38px;display:inline-flex;flex-direction:column;align-items:center;gap:15px;
-    border:0;background:none;padding:8px;letter-spacing:.3em;color:#c9a25f;
+    margin-top:38px;display:inline-flex;flex-direction:column-reverse;align-items:center;
+    gap:14px;border:0;background:none;padding:8px 8px 0;letter-spacing:.3em;color:#c9a25f;
   }
   #start .seed{
     width:15px;height:15px;border-radius:50%;background:#e6c98a;
@@ -106,7 +118,13 @@
   /* --------------------------------------------------------------- story */
   #story{position:relative;z-index:2;padding:4vh 0 2vh}
 
-  /* the road itself — one SVG spanning every chapter, drawn by scroll */
+  /* The trail is its own layer in page coordinates rather than a child of
+     #story, because it has to begin at the Begin button — which lives in the
+     hero, a whole section further up. Its top and height are set from the
+     seed and the end of the story on every layout. */
+  #trail{position:absolute;left:0;width:100%;z-index:1;pointer-events:none}
+
+  /* the road itself — one SVG from the seed through every chapter, drawn by scroll */
   #road{
     position:absolute;inset:0;width:100%;height:100%;
     pointer-events:none;overflow:visible;
@@ -124,7 +142,7 @@
     border-radius:50%;background:#f2dcae;box-shadow:0 0 16px 4px rgba(226,190,120,.55);
     z-index:3;pointer-events:none;opacity:0;transition:opacity .4s ease;
   }
-  #story.live #head{opacity:1}
+  #trail.live #head{opacity:1}
 
   .chapter{
     position:relative;display:grid;align-items:center;gap:clamp(16px,4vw,48px);
@@ -271,10 +289,15 @@
 
   @media (max-width:760px){
     .chapter{grid-template-columns:1fr;justify-items:center;text-align:center;
-             --frame:min(74vw,320px)}
+             --frame:min(60vw,260px)}
     .chapter .relics,.chapter .plate,.chapter .said,
     .chapter.flip .relics,.chapter.flip .said{
       grid-column:1;grid-row:auto;justify-self:center;text-align:center}
+    /* The single column is the full width of the screen, and --frame is only
+       ever read by grid-template-columns — which this block overrides. So the
+       print was stretching to ~89% of a phone screen with nothing holding it
+       back. Give the plate the width directly. */
+    .chapter .plate{width:var(--frame)}
     .chapter .said{max-width:32ch}
     .relics{max-width:none;order:3}
   }
@@ -348,9 +371,12 @@
   <div id="cue"><span class="cue-t">Scroll to follow the trail</span><span class="chev"></span></div>
 </header>
 
-<main id="story">
-  <svg id="road" preserveAspectRatio="none" aria-hidden="true"><path id="roadline"></path></svg>
+<div id="trail" aria-hidden="true">
+  <svg id="road" preserveAspectRatio="none"><path id="roadline"></path></svg>
   <div id="head"></div>
+</div>
+
+<main id="story">
   <!-- chapters are built from CHAPTERS below -->
 </main>
 
@@ -395,6 +421,8 @@ const CHAPTERS = [
 ];
 
 const storyEl  = document.getElementById('story');
+const trailEl  = document.getElementById('trail');
+const seedEl   = document.querySelector('#start .seed');
 const roadSvg  = document.getElementById('road');
 const roadLine = document.getElementById('roadline');
 const headEl   = document.getElementById('head');
@@ -451,12 +479,20 @@ const hangs    = chapters.map(c => c.querySelector('.hang'));
 // One path threaded through the middle of every chapter, alternating side to
 // side so it reads as a route rather than a rule. Rebuilt on resize because
 // the whole thing is expressed in the story block's own pixel space.
-let roadLen = 0;
+let roadLen = 0, trailTop = 0, trailH = 0;
 function buildRoad() {
-  const box = storyEl.getBoundingClientRect();
-  const top = box.top + scrollY;
-  const w = box.width, h = box.height;
-  roadSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  // The route starts at the dead centre of the seed inside the Begin button
+  // and runs to the foot of the last chapter. Everything below is expressed
+  // in that block's own pixel space.
+  const seed = seedEl.getBoundingClientRect();
+  const st   = storyEl.getBoundingClientRect();
+  const w    = document.documentElement.clientWidth;
+
+  trailTop = seed.top + scrollY + seed.height / 2;
+  trailH   = Math.max(1, st.top + scrollY + st.height - trailTop);
+  trailEl.style.top    = trailTop + 'px';
+  trailEl.style.height = trailH + 'px';
+  roadSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + trailH);
 
   // The road passes on the side the frame ISN'T, so it never crosses a photo.
   // On a phone the chapter stacks instead of sitting in three columns and the
@@ -464,13 +500,13 @@ function buildRoad() {
   // at the desktop offset it runs behind every photograph and the trail
   // simply disappears for the length of the story.
   const off = w < 760 ? 0.075 : 0.28;
-  const pts = [[w * 0.5, 0]];
+  const pts = [[seed.left + seed.width / 2, 0]];
   chapters.forEach((c, i) => {
     const r = c.getBoundingClientRect();
-    const y = r.top + scrollY - top + r.height / 2;
+    const y = r.top + scrollY - trailTop + r.height / 2;
     pts.push([w * (i % 2 ? 1 - off : off), y]);
   });
-  pts.push([w * 0.5, h]);
+  pts.push([w * 0.5, trailH]);
 
   // Catmull-Rom through the nodes, converted to cubic beziers, so the route
   // curves through each stop instead of turning a corner at it.
@@ -490,11 +526,15 @@ function buildRoad() {
 // --------------------------------------------------------- scroll driving
 let revealPx = 0;
 function onScroll() {
-  const box = storyEl.getBoundingClientRect();
-  // how far the reveal line has travelled down the story block
-  revealPx = Math.max(0, Math.min(box.height, innerHeight * 0.62 - box.top));
+  const box = trailEl.getBoundingClientRect();
+  // The reveal line is pinned to wherever the seed sits at rest, so that with
+  // the page at the top the reveal is exactly zero and the glowing dot is
+  // sitting on the seed rather than four dashes down the road. A fixed 62%
+  // line put it below the seed before the guest had scrolled at all.
+  const line = Math.min(innerHeight * 0.62, trailTop);
+  revealPx = Math.max(0, Math.min(trailH, line - box.top));
   roadSvg.style.setProperty('--rev', revealPx + 'px');
-  storyEl.classList.toggle('live', revealPx > 4 && revealPx < box.height);
+  trailEl.classList.toggle('live', revealPx < trailH);
 
   if (roadLen) {
     // walk the path to find the point at the reveal height — the path is
@@ -635,10 +675,12 @@ addEventListener('load',   () => { buildRoad(); onScroll(); });
 // returning the old coordinates — so the line runs out half way down and the
 // dot sits in the wrong place. Rebuild whenever the block actually resizes.
 let pending = 0;
-new ResizeObserver(() => {
+const ro = new ResizeObserver(() => {
   cancelAnimationFrame(pending);
   pending = requestAnimationFrame(() => { buildRoad(); onScroll(); });
-}).observe(storyEl);
+});
+ro.observe(storyEl);
+ro.observe(document.getElementById('hero'));
 
 buildRoad(); onScroll(); wake();
 
