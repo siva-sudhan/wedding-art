@@ -25,9 +25,13 @@
   /* -------------------------------------------------------- flower border
      A soft garland down both edges, fixed so it holds its place while the
      story scrolls past behind it. */
+  /* Painted in as a background rather than an <img>: a missing or not-yet-
+     pushed file then renders as nothing at all, instead of parking a broken-
+     image icon in the middle of a wedding invitation. */
   .edge{
     position:fixed;top:0;height:100svh;z-index:0;
     width:min(24vw,290px);pointer-events:none;user-select:none;
+    background-size:cover;background-position:50% 50%;background-repeat:no-repeat;
     opacity:.34;filter:saturate(.86) brightness(.72);
     /* the garland has to run off the top and bottom of the screen rather than
        stop on a straight line; the fade lives here because a quantised PNG
@@ -35,9 +39,8 @@
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);
             mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);
   }
-  .edge img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
-  .edge-l{left:-3%}
-  .edge-r{right:-3%}
+  .edge-l{left:-3%;background-image:url("assets/flower-left.png")}
+  .edge-r{right:-3%;background-image:url("assets/flower-right.png")}
   @media (max-width:760px){ .edge{width:36vw;opacity:.2} }
 
   /* ---------------------------------------------------------------- hero */
@@ -332,8 +335,8 @@
 </head>
 <body>
 
-<div class="edge edge-l"><img src="assets/flower-left.png" alt=""></div>
-<div class="edge edge-r"><img src="assets/flower-right.png" alt=""></div>
+<div class="edge edge-l" aria-hidden="true"></div>
+<div class="edge edge-r" aria-hidden="true"></div>
 
 <header id="hero">
   <p class="kicker">Shiva &amp; Meena</p>
