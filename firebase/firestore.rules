@@ -1,0 +1,105 @@
+rules_version = '2';
+
+// Likes for the story page.
+//
+//   chapters/{chapterId}          public   { count, names: [{ n, u }] }
+//   likes/{chapterId}__{uid}      private  { chapter, name, at }
+//
+// The page only ever reads the eight small `chapters` documents, which keeps
+// a busy day well inside the free tier. The `likes` ledger exists purely so
+// these rules can tell whether this visitor has already left a heart here:
+// its document id is built from the chapter and the visitor's anonymous id,
+// so a second heart from the same browser would have to create a document
+// that already exists — which nothing below allows.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function chapterIds() {
+      return ['2021-college', '2022-two-cities', '2023-she-said-yes',
+              '2024-long-way', '2025-coming-home', '2026-yes',
+              '2026-engagement', '2026-reception'];
+    }
+
+    function ledger(ch) {
+      return /databases/$(database)/documents/likes/$(ch + '__' + request.auth.uid);
+    }
+
+    // True only inside the batch that writes this visitor's first heart on
+    // this chapter: the ledger entry did not exist before, and will after.
+    function isFirstHeart(ch) {
+      return request.auth != null
+          && !exists(ledger(ch))
+          && existsAfter(ledger(ch));
+    }
+
+    // A name entry must be this visitor's own, and a sensible size.
+    function validEntry(e) {
+      return e is map
+          && e.keys().hasOnly(['n', 'u'])
+          && e.n is string && e.n.size() > 0 && e.n.size() <= 40
+          && e.u == request.auth.uid;
+    }
+
+    // Names may only grow, by at most one entry, and that entry is theirs.
+    function namesOk(before, after) {
+      let added = after.removeAll(before);
+      return after.hasAll(before)
+          && (added.size() == 0 || (added.size() == 1 && validEntry(added[0])));
+    }
+
+    match /likes/{likeId} {
+      // A visitor may check whether their own entry exists, and nothing else:
+      // nobody can list the ledger, or read anyone else's entry.
+      allow get: if request.auth != null
+          && likeId.split('__').size() == 2
+          && likeId.split('__')[1] == request.auth.uid;
+      allow list: if false;
+      allow create: if request.auth != null
+          && request.resource.data.keys().hasOnly(['chapter', 'name', 'at'])
+          && request.resource.data.chapter in chapterIds()
+          && likeId == request.resource.data.chapter + '__' + request.auth.uid
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 40
+          && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+
+    // Guests who signed their hearts with a name and tapped "Take me there".
+    // Private: only you read these, in the console. A guest can only write
+    // their own document, and each tap adds exactly one.
+    match /interest/{uid} {
+      function validInterest() {
+        return request.auth != null && request.auth.uid == uid
+            && request.resource.data.keys().hasOnly(['name', 'taps', 'at'])
+            && request.resource.data.name is string
+            && request.resource.data.name.size() > 0
+            && request.resource.data.name.size() <= 40
+            && request.resource.data.at == request.time;
+      }
+      allow read: if false;
+      allow create: if validInterest() && request.resource.data.taps == 1;
+      allow update: if validInterest() && request.resource.data.taps == resource.data.taps + 1;
+      allow delete: if false;
+    }
+
+    match /chapters/{ch} {
+      allow read: if true;
+
+      allow create: if ch in chapterIds()
+          && isFirstHeart(ch)
+          && request.resource.data.keys().hasOnly(['count', 'names'])
+          && request.resource.data.count == 1
+          && namesOk([], request.resource.data.get('names', []));
+
+      allow update: if ch in chapterIds()
+          && isFirstHeart(ch)
+          && request.resource.data.keys().hasOnly(['count', 'names'])
+          && request.resource.data.count == resource.data.count + 1
+          && namesOk(resource.data.get('names', []),
+                     request.resource.data.get('names', []));
+
+      allow delete: if false;
+    }
+  }
+}
