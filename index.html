@@ -20,6 +20,10 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap">
 <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap">
+<!-- Only the digits and a plus sign: the count is pencilled onto the print in a
+     hand, and subsetting to those characters keeps the font to a couple of KB. -->
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&text=0123456789%2B&display=swap">
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html{scroll-behavior:auto;color-scheme:dark}
@@ -174,6 +178,16 @@
   @keyframes chev{
     0%,100%{transform:rotate(45deg) translate(0,0);opacity:.35}
     50%    {transform:rotate(45deg) translate(4px,4px);opacity:1}
+  }
+
+  /* ---------------------------------------------------------------- motes
+     Gold dust drifting up from the floor. One fixed canvas rather than a few
+     dozen positioned elements: the browser paints it once per frame instead
+     of laying out and compositing every speck on its own. It sits above the
+     garlands and below everything you read. */
+  #motes{
+    position:fixed;inset:0;width:100%;height:100%;
+    z-index:1;pointer-events:none;
   }
 
   /* --------------------------------------------------------------- story */
@@ -426,6 +440,174 @@
   #playbar button{padding:10px 18px;font-size:var(--step--2);letter-spacing:.2em;
     background:rgba(12,4,8,.88);border-color:rgba(168,129,74,.5)}
 
+  /* --------------------------------------------------------------- hearts
+     A coloured-pencil sticker pressed onto the print's bottom-right corner,
+     hanging a little way off the paper, with its count pencilled onto the
+     paper to its left. It lives inside the print, so it swings with the
+     pendulum and pops in with the frame — it is stuck on.
+
+     Two shadows: a tight dark one where the sticker meets the paper, and a
+     wider soft one thrown down and to the right, agreeing with the light the
+     pin's shadow already implies. */
+  .heart{
+    position:absolute;right:-15px;bottom:-13px;z-index:5;
+    width:clamp(46px,17%,60px);aspect-ratio:1;padding:0;border:0;background:none;
+    border-radius:50%;cursor:pointer;transform:rotate(11deg);
+    transition:transform .25s cubic-bezier(.3,1.4,.5,1);
+  }
+  .heart[hidden]{display:none}
+  .heart img{
+    width:100%;height:100%;display:block;pointer-events:none;
+    filter:
+      drop-shadow(0.6px 1px 0.6px rgba(40,6,10,.45))
+      drop-shadow(2.5px 4px 4px rgba(0,0,0,.34))
+      saturate(.72) brightness(1.03);
+    transition:filter .35s ease;
+  }
+  /* Until you've left one yourself it is a little faded, as if waiting for
+     you. Yours is full colour and pressed flatter to the paper. */
+  .heart.mine img{
+    filter:
+      drop-shadow(0.4px .7px .4px rgba(40,6,10,.5))
+      drop-shadow(1.6px 2.6px 2.6px rgba(0,0,0,.3))
+      saturate(1.08);
+  }
+  /* the site-wide button hover would otherwise paint a beige disc behind it */
+  .heart:hover,.heart:active{background:none;border:0}
+  .heart:hover{transform:rotate(7deg) scale(1.08)}
+  .heart:active{transform:rotate(9deg) scale(.95)}
+  .heart:focus-visible{outline-offset:2px;border-radius:50%}
+  .heart.busy{pointer-events:none}
+
+  /* the count, pencilled onto the paper to the sticker's left */
+  .heart .n{
+    position:absolute;right:100%;bottom:24%;margin-right:3px;
+    transform:rotate(-11deg);transform-origin:right center;
+    font:600 clamp(1.05rem,3.4vw,1.3rem)/1 "Caveat","Cormorant Garamond",cursive;
+    color:#8a3a3a;opacity:.88;white-space:nowrap;pointer-events:none;
+  }
+  .heart .n:empty{display:none}
+  .heart .n.bump{animation:countBump .5s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes countBump{0%{transform:rotate(-11deg) scale(1)}40%{transform:rotate(-11deg) scale(1.45)}100%{transform:rotate(-11deg) scale(1)}}
+
+  /* Press on: lifted, then down with a small overshoot. Plays once when the
+     print arrives, after the pin, and again when you add your own. */
+  .chapter.seen .heart:not([hidden]){animation:stickOn .5s cubic-bezier(.3,1.5,.5,1) 1.15s both}
+  .heart.pressed{animation:stickOn .5s cubic-bezier(.3,1.5,.5,1) both !important}
+  @keyframes stickOn{
+    0%  {opacity:0;transform:rotate(24deg) scale(1.45) translate(6px,-10px)}
+    60% {opacity:1;transform:rotate(9deg) scale(.94)}
+    100%{opacity:1;transform:rotate(11deg) scale(1)}
+  }
+
+  /* ---- who has left one, on hover ---- */
+  #like-tip{
+    position:fixed;z-index:40;left:0;top:0;max-width:240px;
+    padding:11px 14px 12px;border-radius:10px;pointer-events:none;
+    background:rgba(20,6,11,.94);border:1px solid rgba(201,162,95,.4);
+    box-shadow:0 12px 32px rgba(0,0,0,.5);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#e8d6b4;font-size:var(--step--1);line-height:1.45;
+    opacity:0;transition:opacity .16s ease;
+  }
+  #like-tip.show{opacity:1}
+  #like-tip .t-h{display:block;margin:0 0 5px;font-size:var(--step--2);font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;color:#c9a25f}
+  #like-tip ul{margin:0;padding:0;list-style:none}
+  #like-tip li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #like-tip li.you{color:#f6e7c8}
+  #like-tip .t-more{margin-top:4px;color:#b99a72;font-style:italic}
+  #like-tip .t-cta{margin-top:6px;color:#c9a25f;font-size:var(--step--2);letter-spacing:.06em}
+
+  /* ---- the dialog ---- */
+  #like-dlg{padding:0;border:0;background:none;color:inherit;max-width:min(92vw,380px);width:100%}
+  #like-dlg::backdrop{background:rgba(8,2,5,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  #like-dlg[open]{animation:dlgIn .28s cubic-bezier(.2,1.1,.4,1)}
+  @keyframes dlgIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .ld-card{
+    position:relative;margin:0;padding:32px 26px 24px;text-align:center;
+    background:linear-gradient(180deg,#2c0c17,#1b070e);
+    border:1px solid rgba(201,162,95,.42);border-radius:16px;
+    box-shadow:0 30px 70px rgba(0,0,0,.6),0 1px 0 rgba(255,235,200,.06) inset;
+  }
+  .ld-card section[hidden]{display:none}
+  .ld-x{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0;
+    border:0;background:none;color:#b99a72;font-size:1.5rem;line-height:1;letter-spacing:0}
+  .ld-x:hover{color:#f2ddb4;background:none}
+  .ld-heart{width:60px;height:60px;display:block;margin:0 auto 6px;transform:rotate(-8deg);
+    filter:drop-shadow(1.5px 3px 3px rgba(0,0,0,.4))}
+  .ld-card h2{margin:0;font-family:"Great Vibes",cursive;font-weight:400;
+    font-size:var(--step-2);color:#f6e7c8;line-height:1.1}
+  .ld-on{margin:4px 0 0;color:#cdb893;font-style:italic}
+  .ld-on em{font-style:normal;color:#f2ddb4}
+  .ld-note{margin:14px 0 0;font-size:var(--step--1);color:#b99a72;line-height:1.55}
+  .ld-label{display:block;margin:18px 0 7px;text-align:left;font-size:var(--step--2);
+    font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9a25f}
+  .ld-label span{letter-spacing:.06em;text-transform:none;font-weight:500;color:#b99a72}
+  #like-name,#ld-edit-name{
+    width:100%;padding:12px 14px;border-radius:10px;font:inherit;font-size:var(--step-0);
+    color:#f6e7c8;background:rgba(255,240,210,.05);border:1px solid rgba(201,162,95,.38);
+  }
+  #like-name::placeholder,#ld-edit-name::placeholder{color:#9a8060}
+  #like-name.ld-field{margin-top:18px}
+  #like-name:focus-visible,#ld-edit-name:focus-visible{outline:2px solid #e6c98a;outline-offset:1px;border-color:transparent}
+  .ld-btns{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+  .ld-btns button{width:100%}
+  .ld-btns.ld-row{flex-direction:row}
+  .ld-btns button.primary{background:linear-gradient(180deg,#d9b871,#b58e4f);border-color:#e6c98a;color:#240811}
+  .ld-btns button.primary:disabled{opacity:.42;cursor:default}
+  .ld-btns button:disabled:hover{background:linear-gradient(180deg,#d9b871,#b58e4f)}
+  .ld-err{margin:12px 0 0;color:#f0a8a0;font-size:var(--step--1);line-height:1.5}
+
+  .ld-list{margin:16px 0 0;padding:0;list-style:none;max-height:38vh;overflow:auto;
+    border-top:1px solid rgba(201,162,95,.18)}
+  .ld-list li{padding:8px 4px;border-bottom:1px solid rgba(201,162,95,.12);color:#e8d6b4;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ld-list li.you{color:#f6e7c8;font-weight:600}
+  .ld-list li.you span{font-weight:500;color:#c9a25f;font-style:italic}
+  .ld-more{margin:10px 0 0;color:#b99a72;font-style:italic;font-size:var(--step--1)}
+  .ld-more:empty{display:none}
+  .ld-me{margin-top:16px;padding-top:12px;border-top:1px solid rgba(201,162,95,.18)}
+  .ld-me p{margin:0;font-size:var(--step--1);color:#b99a72}
+  .ld-me strong{color:#f2ddb4;font-weight:600}
+  .ld-link{display:inline;padding:0;border:0;background:none;font:inherit;
+    font-size:inherit;letter-spacing:0;text-transform:none;color:#d9b871;
+    text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+  .ld-link:hover{background:none;color:#f2ddb4}
+  .ld-edit{margin-top:12px}
+  .ld-hint{margin:8px 0 0;font-size:var(--step--2);color:#8a7050}
+
+  /* ---- the little confirmation after a one-tap heart ---- */
+  #heart-toast{
+    position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 78px);z-index:45;
+    transform:translate(-50%,16px);opacity:0;pointer-events:none;
+    display:flex;align-items:center;gap:9px;max-width:calc(100vw - 32px);
+    padding:10px 16px 10px 12px;border-radius:999px;
+    background:rgba(20,6,11,.94);border:1px solid rgba(201,162,95,.45);
+    box-shadow:0 12px 30px rgba(0,0,0,.5);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#f2ddb4;font-size:var(--step--1);line-height:1.3;
+    transition:opacity .22s ease,transform .3s cubic-bezier(.2,1.2,.4,1);
+  }
+  #heart-toast.show{opacity:1;transform:translate(-50%,0)}
+  #heart-toast.err{border-color:rgba(240,168,160,.6);color:#f6d0c8}
+  #heart-toast img{width:22px;height:22px;flex:none}
+  #heart-toast em{font-style:normal;color:#f6e7c8}
+  #heart-toast span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #heart-toast.err{border-radius:14px;width:max-content;max-width:min(420px,calc(100vw - 32px))}
+  #heart-toast.err span{white-space:normal}
+
+  /* ---- localhost only: which store is this page actually talking to ---- */
+  #heart-mode{
+    position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:46;
+    display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;
+    font:500 12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:0;
+    background:rgba(10,3,6,.9);border:1px solid rgba(255,255,255,.14);color:#e8e0d0;
+  }
+  #heart-mode i{width:8px;height:8px;border-radius:50%;background:#e0a33a}
+  #heart-mode.live i{background:#4cc27a}
+  #heart-mode.down i{background:#e05a4a}
+
   /* --------------------------------------------------------------- sound */
   #sound[hidden]{display:none}
   #sound{
@@ -478,6 +660,7 @@
 
 <div class="edge edge-l" aria-hidden="true"></div>
 <div class="edge edge-r" aria-hidden="true"></div>
+<canvas id="motes" aria-hidden="true"></canvas>
 
 <header id="hero">
   <p class="kicker">Shiva &amp; Meena</p>
@@ -520,6 +703,55 @@
 </section>
 
 <div id="playbar"><button id="resume">Resume</button></div>
+
+<!-- Lives outside the frames on purpose: inside one it would swing with the
+     pendulum, and a list of names that sways is hard to read. -->
+<div id="like-tip" role="tooltip" hidden></div>
+
+<dialog id="like-dlg" aria-labelledby="ld-h1">
+  <form method="dialog" class="ld-card">
+    <button type="button" class="ld-x" aria-label="Close">&times;</button>
+    <img class="ld-heart" src="assets/heart.webp" alt="" width="240" height="240">
+
+    <!-- The very first heart: who is leaving it. Asked once, then remembered. -->
+    <section id="ld-setup">
+      <h2 id="ld-h1">Leave a heart</h2>
+      <p class="ld-on">on <em class="ld-ch"></em></p>
+      <p class="ld-note">Sign it with your name, or stay anonymous. We&rsquo;ll remember
+        your choice, so every other chapter is just a tap.</p>
+      <input id="like-name" class="ld-field" type="text" maxlength="40" autocomplete="name"
+             spellcheck="false" placeholder="Your name" aria-label="Your name (optional)">
+      <div class="ld-btns">
+        <button type="button" class="primary" id="like-named" disabled>Sign with my name</button>
+        <button type="button" id="like-anon">Stay anonymous</button>
+      </div>
+      <p class="ld-err" id="like-err" role="alert" hidden></p>
+    </section>
+
+    <!-- Tapping a heart you have already left: who else has. -->
+    <section id="ld-who" hidden>
+      <h2 id="ld-h2"></h2>
+      <p class="ld-on">on <em class="ld-ch"></em></p>
+      <ul class="ld-list" id="ld-list"></ul>
+      <p class="ld-more" id="ld-more"></p>
+      <div class="ld-me" id="ld-me">
+        <p><span id="ld-me-text"></span> &middot;
+          <button type="button" class="ld-link" id="ld-change">Change</button></p>
+        <div class="ld-edit" id="ld-edit" hidden>
+          <input id="ld-edit-name" type="text" maxlength="40" autocomplete="name"
+                 spellcheck="false" placeholder="Your name" aria-label="Your name">
+          <div class="ld-btns ld-row">
+            <button type="button" class="primary" id="ld-save">Save</button>
+            <button type="button" id="ld-go-anon">Go anonymous</button>
+          </div>
+          <p class="ld-hint">Applies to hearts you leave from now on.</p>
+        </div>
+      </div>
+    </section>
+  </form>
+</dialog>
+
+<div id="heart-toast" role="status" aria-live="polite"></div>
 
 <div id="sound" hidden>
   <button id="sound-btn" aria-pressed="false" aria-label="Turn the music on">
@@ -612,6 +844,12 @@ CHAPTERS.forEach((ch, i) => {
     '<div class="pin"><span class="cast"></span><span class="dome"></span><span class="glint"></span></div>' +
     '<div class="hang"><div class="instax">' + inside +
       '<span class="when">' + ch.yr + '</span>' +
+      // Hidden until the likes store says it is available, so a page that
+      // can't reach it never shows a button that does nothing.
+      '<button class="heart" data-ch="' + ch.id + '" hidden>' +
+        '<img src="assets/heart.webp" alt="" width="240" height="240" draggable="false">' +
+        '<span class="n" aria-hidden="true"></span>' +
+      '</button>' +
     '</div></div>';
 
   const said = document.createElement('div');
@@ -805,7 +1043,7 @@ async function play(from) {
     const c = chapters[autoIdx];
     const y = c.getBoundingClientRect().top + scrollY - (innerHeight - c.offsetHeight) / 2;
     if (!await easeTo(Math.max(0, y), 1500)) return;
-    await sleep(3200);
+    await sleep(5200);        // long enough to actually read the caption
     if (!autoPlaying) return;
   }
   const w = document.getElementById('welcome');
@@ -934,10 +1172,12 @@ addEventListener('visibilitychange', () => {
 
 const AUDIO_DIR = 'assets/audio/';
 
-// hero.mp3 is anchored to two places — the story opens and closes on it.
+// hero.mp3 opens the story. The last chapter's song (the reception) is held
+// once you scroll past it, so it carries on through the welcome and to the
+// very end of the page instead of handing back to hero.mp3.
 const TRACK_DEFS = [
-  { file: 'hero', anchors: [document.getElementById('hero'), welcomeEl] },
-  ...CHAPTERS.map((ch, i) => ({ file: ch.id, anchors: [chapters[i]] }))
+  { file: 'hero', anchors: [document.getElementById('hero')] },
+  ...CHAPTERS.map((ch, i) => ({ file: ch.id, anchors: [chapters[i]], hold: i === CHAPTERS.length - 1 }))
 ];
 
 const trackBox = document.getElementById('tracks');
@@ -947,6 +1187,7 @@ const soundHint = document.getElementById('sound-hint');
 const tracks = TRACK_DEFS.map(def => ({
   file: def.file,
   anchors: def.anchors.filter(Boolean),
+  hold: !!def.hold,  // stays at full once scrolled past (the last chapter)
   el: null,        // created on first approach, not at page load
   gain: 0,         // what we are actually playing at
   shaped: 0,       // target raised to the focus power, before normalising
@@ -980,10 +1221,12 @@ function measureGap() {
   if (mids.length > 1) gap = Math.max(240, sum / (mids.length - 1));
 }
 
-function weigh(el) {
+function weigh(el, hold) {
   const r = el.getBoundingClientRect();
+  const off = (r.top + r.height / 2) - innerHeight / 2;   // < 0: scrolled past it
+  if (hold && off <= 0) return 1;
   if (r.bottom < -innerHeight || r.top > innerHeight * 2) return 0;
-  const d = Math.abs((r.top + r.height / 2) - innerHeight / 2);
+  const d = Math.abs(off);
   const near = gap * 0.15;                 // a plateau, so dead centre is steady
   const far  = gap * 0.85;
   if (d <= near) return 1;
@@ -1000,7 +1243,7 @@ function ensureLoaded(t) {
   // close enough that reading two chapters does not drag down seven files.
   const close = t.anchors.some(a => {
     const r = a.getBoundingClientRect();
-    return r.top < innerHeight + gap * 1.1 && r.bottom > -gap * 0.8;
+    return r.top < innerHeight + gap * 1.1 && (t.hold || r.bottom > -gap * 0.8);
   });
   if (!close) return;
 
@@ -1035,7 +1278,7 @@ function audioFrame(now) {
   let total = 0;
   for (const t of tracks) {
     ensureLoaded(t);
-    t.target = t.dead ? 0 : Math.max(...t.anchors.map(weigh));
+    t.target = t.dead ? 0 : Math.max(...t.anchors.map(a => weigh(a, t.hold)));
     // Raised to a power before the weights are normalised, so the nearer
     // chapter wins decisively instead of politely. Sharing the weights raw
     // left the previous track at 0.42 when the next chapter was already three
@@ -1124,6 +1367,576 @@ if (recall() === 'off') {
 addEventListener('scroll', audioWake, { passive: true });
 addEventListener('resize', audioWake);
 addEventListener('visibilitychange', () => { if (!document.hidden) audioWake(); });
+// ==================================================================== hearts
+// Guests press a heart onto the chapters they love. The first time, they're
+// asked once whether to sign with a name or stay anonymous; after that every
+// other chapter is a single tap. Counts and names are shared through Firebase
+// — see firebase/SETUP.md.
+//
+// These values are public by design: they name the project, they don't
+// unlock it. What anyone can do is decided by firebase/firestore.rules.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCZmvkvR9enOTHD0WjLFBk1wY0bF_Rm73A",
+  authDomain: "shiva-meena-wedding.firebaseapp.com",
+  projectId: "shiva-meena-wedding",
+  storageBucket: "shiva-meena-wedding.firebasestorage.app",
+  messagingSenderId: "503681480996",
+  appId: "1:503681480996:web:9d9da58c5841065f819bb1",
+  measurementId: "G-8062ZXL6WB"
+};
+
+const HEART_SDK = 'https://www.gstatic.com/firebasejs/12.19.0/';
+const ON_LOCALHOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+
+const heartBtns = [...document.querySelectorAll('.heart')];
+const likeTip   = document.getElementById('like-tip');
+const likeDlg   = document.getElementById('like-dlg');
+const $id       = id => document.getElementById(id);
+const titleOf   = id => (CHAPTERS.find(c => c.id === id) || {}).t || '';
+const canHover  = matchMedia('(hover:hover)').matches;
+
+let likeData = {};                  // chapterId -> { count, names: [{ n, u }] }
+let heartStore = null;
+let openCh = null;
+
+// ---- remembered in this browser ----
+// Who you are: asked once, used for every heart after. `null` = not asked yet.
+const ME_KEY = 'wed-heart-me';
+const readJSON = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+let me = readJSON(ME_KEY, null);                                   // { name: 'Shiva' | '' }
+
+// Which chapters you've hearted, kept separately for each store. When preview
+// and live shared one list, hearts left while trying the preview made the
+// live page believe you had already hearted those chapters, so it never sent
+// anything to Firebase at all.
+let MINE_KEY = 'wed-hearts:none';
+let mine = {};
+try { localStorage.removeItem('wed-hearts'); } catch (e) {}      // the old shared list
+const saveMine = () => writeJSON(MINE_KEY, mine);
+const isMine = ch => !!mine[ch] ||
+  !!(heartStore && heartStore.uid && (likeData[ch]?.names || []).some(e => e.u === heartStore.uid));
+
+// ---- the list of who has left one, shared by the hover card and dialog ----
+// Your own heart comes first as "You"; then everyone else, newest first.
+function whoRows(ch) {
+  const d = likeData[ch] || { count: 0, names: [] };
+  const uid = heartStore && heartStore.uid;
+  const others = (d.names || []).filter(e => !uid || e.u !== uid).map(e => e.n).reverse();
+  const myEntry = uid && (d.names || []).find(e => e.u === uid);
+  const iAmIn = isMine(ch);
+  const myName = myEntry ? myEntry.n : (mine[ch] && mine[ch].name) || '';
+  const named = (d.names || []).length;
+  // anonymous hearts = total minus every named one, minus mine if mine was anonymous
+  const anon = Math.max(0, (d.count || 0) - named - (iAmIn && !myEntry && !myName ? 1 : 0));
+  return { count: d.count || 0, iAmIn, myName, others, anon };
+}
+
+// Everything guests typed goes in through textContent, never as markup.
+const el = (tag, cls, text) => { const x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; };
+
+function showTip(b) {
+  const ch = b.dataset.ch, w = whoRows(ch);
+  likeTip.replaceChildren();
+  if (!w.count) {
+    likeTip.append(el('span', 't-h', 'No hearts yet'), el('div', '', 'Be the first to leave one'));
+  } else {
+    likeTip.append(el('span', 't-h', w.count === 1 ? '1 heart' : w.count + ' hearts'));
+    const ul = el('ul');
+    if (w.iAmIn) ul.append(el('li', 'you', w.myName ? 'You · ' + w.myName : 'You'));
+    w.others.slice(0, 7).forEach(n => ul.append(el('li', '', n)));
+    if (ul.children.length) likeTip.append(ul);
+    const more = [];
+    if (w.others.length > 7) more.push('+ ' + (w.others.length - 7) + ' more');
+    if (w.anon) more.push((ul.children.length ? 'and ' : '') + w.anon + ' anonymous');
+    if (more.length) likeTip.append(el('div', 't-more', more.join(', ')));
+  }
+  if (!isMine(ch)) likeTip.append(el('div', 't-cta', me ? 'Tap to leave yours' : 'Tap to leave a heart'));
+  likeTip.hidden = false;
+  const r = b.getBoundingClientRect(), tw = likeTip.offsetWidth, th = likeTip.offsetHeight;
+  let x = r.left + r.width / 2 - tw / 2, y = r.top - th - 10;
+  x = Math.max(8, Math.min(innerWidth - tw - 8, x));
+  if (y < 8) y = r.bottom + 10;
+  likeTip.style.left = x + 'px'; likeTip.style.top = y + 'px';
+  requestAnimationFrame(() => likeTip.classList.add('show'));
+}
+function hideTip() { likeTip.classList.remove('show'); likeTip.hidden = true; }
+
+// ---- the toast after a one-tap heart ----
+let toastTimer = 0;
+function toast(parts, isErr) {
+  const t = $id('heart-toast');
+  t.replaceChildren();
+  if (!isErr) { const i = el('img'); i.src = 'assets/heart.webp'; i.alt = ''; t.append(i); }
+  const span = el('span');
+  parts.forEach(p => span.append(typeof p === 'string' ? document.createTextNode(p) : p));
+  t.append(span);
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), isErr ? 5200 : 2600);
+}
+
+// ---- the dialog: first heart (setup) or who-has (who) ----
+function openDialog(ch, mode) {
+  openCh = ch;
+  likeDlg.querySelectorAll('.ld-ch').forEach(x => { x.textContent = titleOf(ch); });
+  $id('ld-setup').hidden = mode !== 'setup';
+  $id('ld-who').hidden = mode !== 'who';
+  likeDlg.setAttribute('aria-labelledby', mode === 'setup' ? 'ld-h1' : 'ld-h2');
+  $id('like-err').hidden = true;
+  if (mode === 'setup') {
+    $id('like-name').value = '';
+    $id('like-named').disabled = true;
+  } else {
+    fillWho(ch);
+    $id('ld-edit').hidden = true;
+  }
+  if (!likeDlg.open) likeDlg.showModal();
+  // On a phone, focusing the field throws the keyboard up before anyone has
+  // read the card or decided whether to give a name at all.
+  if (mode === 'setup' && canHover) $id('like-name').focus();
+}
+
+function fillWho(ch) {
+  const w = whoRows(ch);
+  $id('ld-h2').textContent = w.count === 1 ? '1 heart' : w.count + ' hearts';
+  const list = $id('ld-list');
+  list.replaceChildren();
+  if (w.iAmIn) {
+    const li = el('li', 'you', 'You');
+    if (w.myName) li.append(el('span', '', ' · ' + w.myName));
+    else li.append(el('span', '', ' · anonymously'));
+    list.append(li);
+  }
+  w.others.forEach(n => list.append(el('li', '', n)));
+  $id('ld-more').textContent = w.anon
+    ? (list.children.length ? 'and ' : '') + w.anon + (w.anon === 1 ? ' guest' : ' guests') + ' anonymously'
+    : '';
+  const mt = $id('ld-me-text');
+  mt.replaceChildren();
+  if (me && me.name) mt.append('Your hearts are signed ', el('strong', '', me.name));
+  else mt.append('Your hearts are anonymous');
+}
+
+// ---- leaving a heart ----
+const inFlight = new Set();
+
+// Plain words for guests; the precise cause on your own machine, where you
+// are the one who has to fix it.
+function explain(e) {
+  const code = (e && (e.code || e.name)) || '';
+  if (!ON_LOCALHOST) return 'That didn’t go through — please try again in a moment.';
+  if (/operation-not-allowed|admin-restricted/.test(code))
+    return 'Firebase refused anonymous sign-in. Turn it on: Authentication → Sign-in method → Anonymous.';
+  if (/unauthorized-domain/.test(code))
+    return 'This address isn’t an authorized domain. Open the page at http://localhost:… rather than 127.0.0.1.';
+  if (/permission-denied/.test(code))
+    return 'The database refused the write (permission-denied). Re-publish firebase/firestore.rules.';
+  if (/network|unavailable|failed-to-fetch/i.test(code + ' ' + (e && e.message)))
+    return 'Couldn’t reach Firebase — check the connection.';
+  return 'Failed: ' + (code || (e && e.message) || 'unknown error') + ' (details in the console).';
+}
+
+async function leaveHeart(ch, name) {
+  if (inFlight.has(ch) || isMine(ch)) return;
+  inFlight.add(ch);
+  const b = heartBtns.find(x => x.dataset.ch === ch);
+  b.classList.add('busy');
+
+  // Show it straight away and let the server catch up — a tap that waits a
+  // second to respond feels broken. Rolled back if the server says no.
+  const before = likeData[ch] ? JSON.parse(JSON.stringify(likeData[ch])) : null;
+  const d = likeData[ch] = likeData[ch] ? { ...likeData[ch], names: [...(likeData[ch].names || [])] } : { count: 0, names: [] };
+  d.count = (d.count || 0) + 1;
+  if (name) d.names.push({ n: name, u: (heartStore && heartStore.uid) || 'me' });
+  mine[ch] = { name };
+  renderHearts();
+  b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed');
+  const n = b.querySelector('.n'); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump');
+
+  try {
+    await heartStore.like(ch, name);
+    saveMine();
+    toast(name
+      ? ['Heart left on ', el('em', '', titleOf(ch)), ' — signed ' + name]
+      : ['Heart left on ', el('em', '', titleOf(ch)), ' — anonymously']);
+  } catch (e) {
+    if (e && e.already) {
+      if (before) likeData[ch] = before; else delete likeData[ch];
+      saveMine();
+      toast(['You’d already left a heart on ', el('em', '', titleOf(ch))]);
+    } else {
+      console.warn('[hearts] failed:', e);
+      if (before) likeData[ch] = before; else delete likeData[ch];
+      delete mine[ch];
+      toast([explain(e)], true);
+    }
+  } finally {
+    inFlight.delete(ch);
+    b.classList.remove('busy');
+    renderHearts();
+  }
+}
+
+function renderHearts() {
+  for (const b of heartBtns) {
+    const ch = b.dataset.ch, d = likeData[ch] || { count: 0 };
+    b.querySelector('.n').textContent = d.count > 0 ? d.count : '';
+    b.classList.toggle('mine', isMine(ch));
+    b.setAttribute('aria-label',
+      (isMine(ch) ? 'See who left hearts on ' : 'Leave a heart on ') + titleOf(ch) +
+      (d.count ? ', ' + d.count + (d.count === 1 ? ' heart' : ' hearts') : ''));
+  }
+  if (likeDlg.open && !$id('ld-who').hidden) fillWho(openCh);
+}
+
+// ---- wiring ----
+for (const b of heartBtns) {
+  if (canHover) {
+    b.addEventListener('mouseenter', () => showTip(b));
+    b.addEventListener('mouseleave', hideTip);
+  }
+  b.addEventListener('focus', () => { if (b.matches(':focus-visible')) showTip(b); });
+  b.addEventListener('blur', hideTip);
+  b.addEventListener('click', () => {
+    hideTip();
+    const ch = b.dataset.ch;
+    if (isMine(ch)) return openDialog(ch, 'who');        // yours: see who else
+    if (!me) return openDialog(ch, 'setup');             // first ever: ask once
+    leaveHeart(ch, me.name);                             // otherwise: one tap
+  });
+}
+addEventListener('scroll', hideTip, { passive: true });
+
+function chooseAndSend(name) {
+  name = name.trim().replace(/\s+/g, ' ').slice(0, 40);
+  me = { name }; writeJSON(ME_KEY, me);
+  likeDlg.close();
+  leaveHeart(openCh, name);
+}
+$id('like-name').addEventListener('input', e => { $id('like-named').disabled = !e.target.value.trim(); });
+// Two text fields and no submit button means the browser won't submit on
+// Enter by itself, so Enter is wired up directly on each field.
+$id('like-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); if (e.target.value.trim()) chooseAndSend(e.target.value); }
+});
+$id('ld-edit-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); saveMe(e.target.value); }
+});
+$id('like-named').addEventListener('click', () => chooseAndSend($id('like-name').value));
+$id('like-anon').addEventListener('click', () => chooseAndSend(''));
+
+$id('ld-change').addEventListener('click', () => {
+  const box = $id('ld-edit'); box.hidden = !box.hidden;
+  if (!box.hidden) { $id('ld-edit-name').value = (me && me.name) || ''; $id('ld-edit-name').focus(); }
+});
+function saveMe(name) {
+  me = { name: name.trim().replace(/\s+/g, ' ').slice(0, 40) }; writeJSON(ME_KEY, me);
+  $id('ld-edit').hidden = true; fillWho(openCh);
+}
+$id('ld-save').addEventListener('click', () => saveMe($id('ld-edit-name').value));
+$id('ld-go-anon').addEventListener('click', () => saveMe(''));
+
+// The close button is type="button" on purpose: as a submit button it became
+// the form's default, so Enter in the name field "clicked" it and closed the
+// dialog without leaving a heart.
+likeDlg.querySelector('.ld-x').addEventListener('click', () => likeDlg.close());
+likeDlg.querySelector('form').addEventListener('submit', e => e.preventDefault());
+likeDlg.addEventListener('click', e => { if (e.target === likeDlg) likeDlg.close(); });
+
+// ---- stores ----
+// Local preview: only on your own machine, and only while there's no config.
+// It keeps hearts in this browser so the whole flow can be tried — and it
+// says so on screen, so it can never pass for the real thing.
+function localHeartStore() {
+  const K = 'wed-hearts-preview-data';
+  let data = readJSON(K, {});
+  const subs = [];
+  return {
+    id: 'preview', uid: 'preview',
+    subscribe(cb) { subs.push(cb); cb(data); },
+    async like(ch, name) {
+      await new Promise(r => setTimeout(r, 300));
+      const d = data[ch] || (data[ch] = { count: 0, names: [] });
+      d.count += 1;
+      if (name) d.names.push({ n: name, u: 'preview' });
+      writeJSON(K, data);
+      subs.forEach(f => f(data));
+    }
+  };
+}
+
+async function firebaseHeartStore(cfg) {
+  const [appM, fs, au] = await Promise.all([
+    import(HEART_SDK + 'firebase-app.js'),
+    import(HEART_SDK + 'firebase-firestore.js'),
+    import(HEART_SDK + 'firebase-auth.js')
+  ]);
+  const app = appM.initializeApp(cfg);
+  const db = fs.getFirestore(app), auth = au.getAuth(app);
+  const store = {
+    id: cfg.projectId, uid: null,
+    subscribe(cb) {
+      // An existing anonymous identity is picked up here; a new one is only
+      // created when someone actually leaves a heart.
+      au.onAuthStateChanged(auth, u => { store.uid = u ? u.uid : null; cb(null); });
+      // Eight small documents per visit, not one per heart ever left.
+      fs.onSnapshot(fs.collection(db, 'chapters'), snap => {
+        const d = {}; snap.forEach(x => { d[x.id] = x.data(); }); cb(d);
+      }, err => { console.warn('[hearts] read failed:', err.code, err); setMode('down', 'read failed: ' + err.code); });
+    },
+    async like(ch, name) {
+      if (!auth.currentUser) await au.signInAnonymously(auth);
+      const uid = store.uid = auth.currentUser.uid;
+      const ledger = fs.doc(db, 'likes', ch + '__' + uid);
+      if ((await fs.getDoc(ledger)).exists()) throw Object.assign(new Error('already'), { already: true });
+      // The ledger entry and the chapter's count go in one batch: the rules
+      // only accept the count rising alongside a brand-new ledger entry.
+      const batch = fs.writeBatch(db);
+      batch.set(ledger, { chapter: ch, name, at: fs.serverTimestamp() });
+      const upd = { count: fs.increment(1) };
+      if (name) upd.names = fs.arrayUnion({ n: name, u: uid });
+      batch.set(fs.doc(db, 'chapters', ch), upd, { merge: true });
+      await batch.commit();
+    }
+  };
+  return store;
+}
+
+// On localhost, a small badge saying which store this page is really using.
+// Without it, a cached copy of the page from before the config was pasted in
+// looks exactly like the live one — which is how hearts "saved" while
+// Firestore stayed empty.
+function setMode(kind, text) {
+  if (!ON_LOCALHOST) return;
+  let m = $id('heart-mode');
+  if (!m) { m = el('div'); m.id = 'heart-mode'; m.append(el('i'), el('span')); document.body.append(m); }
+  m.className = kind;
+  m.querySelector('span').textContent = 'hearts: ' + text;
+}
+
+(async () => {
+  try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG) {
+      heartStore = await firebaseHeartStore(FIREBASE_CONFIG);
+      setMode('live', 'live · ' + FIREBASE_CONFIG.projectId);
+      console.info('[hearts] live — Firebase project', FIREBASE_CONFIG.projectId);
+    } else if (ON_LOCALHOST) {
+      heartStore = localHeartStore();
+      setMode('preview', 'PREVIEW · this browser only, not saved online');
+      console.info('[hearts] preview mode — no FIREBASE_CONFIG, nothing leaves this browser');
+    }
+  } catch (e) {
+    console.warn('[hearts] unavailable:', e);
+    setMode('down', 'could not load Firebase — see console');
+    heartStore = null;
+  }
+  if (!heartStore) return;                    // no store: the stickers stay hidden
+  MINE_KEY = 'wed-hearts:' + heartStore.id;
+  mine = readJSON(MINE_KEY, {});
+  heartBtns.forEach(b => { b.hidden = false; });
+  heartStore.subscribe(d => { if (d) likeData = d; renderHearts(); });
+})();
+
+// ===================================================================== motes
+// Gold light drifting up through the page, in three depths:
+//   far   — tiny hard pinpoints, slow, barely moved by scrolling
+//   mid   — the main glowing specks; about a third of these breathe
+//   near  — a few large, very soft out-of-focus discs, like lens bokeh,
+//           drifting fastest and pushed hardest by the scroll
+// The sprites are built pixel by pixel with an exponential falloff: a hot,
+// near-white core, a gold halo, and a long faint amber tail. The first
+// version used a two-stop gradient, which falls off almost linearly and
+// leaves a visible disc edge — it read as beige buttons, not as light.
+
+const moteCanvas = document.getElementById('motes');
+const mx = moteCanvas.getContext('2d', { alpha: true });
+
+function sprite(S, fn) {
+  const c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d'), img = g.createImageData(S, S), px = img.data;
+  const h = S / 2;
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+    const d = Math.hypot(x + 0.5 - h, y + 0.5 - h) / h;      // 0 centre .. 1 edge
+    const [r, gg, b, a] = fn(d);
+    const i = (y * S + x) * 4;
+    px[i] = r; px[i + 1] = gg; px[i + 2] = b; px[i + 3] = Math.round(Math.min(1, a) * 255);
+  }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+const gauss = (d, s) => Math.exp(-(d / s) * (d / s));
+const smooth01 = u => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+
+// A point of light. `warm` shifts the halo from pale gold toward amber, so
+// the field has a range of tones instead of one repeated dot.
+function lightSprite(warm) {
+  const halo = [255, 214 - warm * 30, 128 - warm * 50];
+  const tail = [242, 156 - warm * 20, 60 - warm * 20];
+  return sprite(128, d => {
+    const core = gauss(d, 0.075), mid = 0.58 * gauss(d, 0.31), far = 0.18 * gauss(d, 0.66);
+    const I = core + mid + far;
+    if (I < 0.002) return [0, 0, 0, 0];
+    const mixc = k => (core * [255, 251, 236][k] + mid * halo[k] + far * tail[k]) / I;
+    return [mixc(0), mixc(1), mixc(2), I];
+  });
+}
+// An out-of-focus disc: nearly flat, a soft edge, and a faintly brighter rim,
+// which is what an out-of-focus highlight actually looks like through a lens.
+const BOKEH = sprite(128, d => {
+  if (d >= 1) return [0, 0, 0, 0];
+  // A filled disc first, the rim only a hint on top of it — with the rim
+  // leading, these read as hollow rings, like soap bubbles drawn on glass.
+  const edge = 1 - smooth01((d - 0.62) / 0.38);
+  const rim = 0.16 * gauss(d - 0.78, 0.12);
+  return [255, 214, 146, edge * (0.62 + rim) * (1 - 0.18 * d)];
+});
+// The brief four-point glint a breather throws at the top of its swell.
+const GLINT = sprite(128, d => [0, 0, 0, 0]);
+(() => {
+  const g = GLINT.getContext('2d'), h = 64;
+  g.globalCompositeOperation = 'lighter';
+  for (const [w, len, a] of [[1.4, 60, 0.9], [4, 30, 0.35]]) {
+    for (const ang of [0, Math.PI / 2]) {
+      g.save(); g.translate(h, h); g.rotate(ang);
+      const gr = g.createLinearGradient(-len, 0, len, 0);
+      gr.addColorStop(0, 'rgba(255,236,190,0)');
+      gr.addColorStop(0.5, 'rgba(255,248,228,' + a + ')');
+      gr.addColorStop(1, 'rgba(255,236,190,0)');
+      g.fillStyle = gr; g.fillRect(-len, -w / 2, len * 2, w);
+      g.restore();
+    }
+  }
+})();
+const LIGHTS = [lightSprite(0), lightSprite(0.5), lightSprite(1)];
+
+let motes = [], mw = 0, mh = 0, mdpr = 1;
+
+// How many of the mid layer slowly breathe rather than just drift.
+const FLY_SHARE = 0.34;
+// How dim a breather gets at the bottom of its breath — never fully out.
+const FLY_FLOOR = 0.16;
+
+const LAYERS = {
+  //        drawn size     alpha         rise px/s   sway       scroll push
+  far:  { d: [7, 14],   a: [0.35, 0.8],  vy: [3, 8],   amp: [4, 12],  push: 0.08 },
+  mid:  { d: [22, 50],  a: [0.45, 0.9],  vy: [8, 20],  amp: [8, 28],  push: 0.22 },
+  near: { d: [44, 96],  a: [0.035, 0.08], vy: [14, 28], amp: [10, 30], push: 0.55 },
+};
+const rnd = ([lo, hi]) => lo + Math.random() * (hi - lo);
+
+function seed(m, startAnywhere) {
+  const L = LAYERS[m.layer];
+  m.x   = Math.random() * mw;
+  m.y   = startAnywhere ? Math.random() * mh : mh + 30 + Math.random() * 140;
+  m.d   = rnd(L.d);
+  m.a   = rnd(L.a);
+  m.vy  = rnd(L.vy);
+  m.amp = rnd(L.amp);
+  m.w   = 0.08 + Math.random() * 0.35;
+  m.ph  = Math.random() * Math.PI * 2;
+  m.tw  = 0.3 + Math.random() * 1.0;
+  m.img = m.layer === 'near' ? BOKEH : LIGHTS[(Math.random() * LIGHTS.length) | 0];
+  m.fly = m.layer === 'mid' && Math.random() < FLY_SHARE;
+  if (m.fly) {
+    m.T   = 8 + Math.random() * 10;              // seconds for one whole breath
+    m.off = Math.random() * m.T;                 // so they never pulse together
+    m.bob = 5 + Math.random() * 14;
+    m.bw  = 0.1 + Math.random() * 0.3;
+  }
+}
+
+// Raised cosine, squared: no corners anywhere, so there is never a moment
+// where one visibly switches on or off.
+function breathe(m, t) {
+  const u = (((t + m.off) / m.T) % 1);
+  const bell = 0.5 - 0.5 * Math.cos(2 * Math.PI * u);
+  return FLY_FLOOR + (1 - FLY_FLOOR) * bell * bell;
+}
+
+function sizeMotes() {
+  // Full resolution. An earlier version drew at 0.6x on the theory that
+  // filling the canvas was the cost; measuring showed the clear and the draws
+  // together take a fraction of a millisecond, and the lower resolution was
+  // smearing the one thing that makes these read as light — the hard core.
+  mdpr = Math.min(devicePixelRatio || 1, 2);
+  mw = innerWidth; mh = innerHeight;
+  moteCanvas.width  = Math.round(mw * mdpr);
+  moteCanvas.height = Math.round(mh * mdpr);
+  mx.setTransform(mdpr, 0, 0, mdpr, 0, 0);
+
+  const N = Math.max(30, Math.min(72, Math.round(mw * mh / 14000)));
+  const want = { far: Math.round(N * 0.9), mid: Math.round(N * 0.55), near: Math.max(3, Math.round(N * 0.1)) };
+  const next = [];
+  for (const layer of ['far', 'mid', 'near']) {
+    const have = motes.filter(m => m.layer === layer);
+    for (let i = 0; i < want[layer]; i++) {
+      const m = have[i] || { layer };
+      if (!have[i]) seed(m, true);
+      next.push(m);
+    }
+  }
+  // bokeh first, so the sharper points draw over the soft discs
+  motes = next.sort((a, b) => (a.layer === 'near' ? -1 : 0) - (b.layer === 'near' ? -1 : 0));
+}
+
+let moteLast = 0, moteRaf = 0, moteScroll = scrollY;
+
+function moteFrame(now) {
+  moteRaf = 0;
+  const dt = moteLast ? Math.min((now - moteLast) / 1000, 0.05) : 0.016;
+  moteLast = now;
+  const t = now / 1000;
+  const dy = scrollY - moteScroll; moteScroll = scrollY;
+
+  mx.clearRect(0, 0, mw, mh);
+  mx.globalCompositeOperation = 'lighter';       // light adds; it does not paint over
+
+  for (const m of motes) {
+    m.y -= m.vy * dt;
+    m.y += dy * LAYERS[m.layer].push;            // nearer things move more
+    if (m.y < -120 || m.y > mh + 260) { seed(m, false); continue; }
+
+    const x = m.x + Math.sin(t * m.w + m.ph) * m.amp;
+    const y = m.fly ? m.y + Math.sin(t * m.bw + m.ph) * m.bob : m.y;
+
+    const up = 1 - y / mh;
+    const edge = Math.min(1, up / 0.12) * Math.min(1, (1 - up) / 0.22);
+    const pulse = m.fly ? breathe(m, t) : (0.8 + 0.2 * Math.sin(t * m.tw + m.ph));
+    const a = m.a * Math.max(0, edge) * pulse;
+    if (a <= 0.004) continue;
+
+    const d = m.d * (m.fly ? 0.82 + 0.3 * pulse : 1);
+    mx.globalAlpha = a;
+    mx.drawImage(m.img, x - d / 2, y - d / 2, d, d);
+
+    // a breather near the top of its swell throws a faint four-point glint
+    if (m.fly && pulse > 0.82) {
+      const g = (pulse - 0.82) / 0.18;
+      const gd = d * 1.5;
+      mx.globalAlpha = a * g * 0.55;
+      mx.drawImage(GLINT, x - gd / 2, y - gd / 2, gd, gd);
+    }
+  }
+  mx.globalAlpha = 1;
+  mx.globalCompositeOperation = 'source-over';
+  moteRaf = requestAnimationFrame(moteFrame);
+}
+
+function moteWake() { if (!moteRaf && !reduced) { moteLast = 0; moteRaf = requestAnimationFrame(moteFrame); } }
+function moteSleep() { cancelAnimationFrame(moteRaf); moteRaf = 0; }
+
+if (reduced) {
+  // Pure decoration, and it is all movement — there is nothing to show
+  // someone who has asked for stillness.
+  moteCanvas.remove();
+} else {
+  sizeMotes();
+  addEventListener('resize', sizeMotes);
+  addEventListener('visibilitychange', () => document.hidden ? moteSleep() : moteWake());
+  moteWake();
+}
 </script>
 </body>
 </html>
