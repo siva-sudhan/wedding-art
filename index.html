@@ -4,23 +4,64 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shiva &amp; Meena — Wedding Reception</title>
-<meta name="theme-color" content="#2a0a14">
+<meta name="theme-color" content="#3a0f1d">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="The story of how Shiva and Meena got here, and an invitation to the evening it ends with — Sunday 25 October 2026.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:title" content="Shiva &amp; Meena — Wedding Reception">
 <meta property="og:description" content="Sunday 25 October 2026 · 6 PM onwards">
 <meta property="og:image" content="assets/poster.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+<!-- 500 is new and carries the body copy: a light serif set in cream on near
+     black erodes visually, so text on this page needs a step more weight than
+     the same face would on paper. -->
+<link rel="preload" as="style"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap">
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html{scroll-behavior:auto}
+  html{scroll-behavior:auto;color-scheme:dark}
   html,body{margin:0}
+
+  /* ------------------------------------------------------------ type scale
+     Eighteen unrelated clamp() values had grown up across this file. These
+     seven steps replace them: a ~1.25 ratio, each one fluid between a phone
+     and a desktop, so sizes stay in proportion to each other at every width
+     instead of crossing over at some awkward middle size.
+
+     --step--2 is the floor for the tracked capitals. It used to bottom out
+     near 9.6px, which is under the size anyone can comfortably read at arm's
+     length on a phone — and those labels carry the date. */
+  :root{
+    --step--2: clamp(0.80rem, 0.76rem + 0.20vw, 0.90rem);
+    --step--1: clamp(0.92rem, 0.87rem + 0.24vw, 1.03rem);
+    --step-0 : clamp(1.06rem, 0.99rem + 0.34vw, 1.22rem);
+    --step-1 : clamp(1.20rem, 1.08rem + 0.58vw, 1.46rem);
+    --step-2 : clamp(1.60rem, 1.30rem + 1.50vw, 2.30rem);
+    --step-3 : clamp(2.00rem, 1.48rem + 2.60vw, 3.20rem);
+    --step-4 : clamp(2.80rem, 1.70rem + 5.20vw, 5.40rem);
+
+    --lh-display: 1.08;
+    --lh-body   : 1.70;   /* a serif with long extenders needs the air */
+    --track-caps: 0.26em;
+
+    --measure   : 34ch;
+  }
+
   body{
     background:radial-gradient(120% 60% at 50% 0%, #3a0f1d 0%, #230a13 40%, #150509 100%) fixed,#150509;
     color:#f3e6d2;font-family:"Cormorant Garamond",Georgia,serif;
+    font-size:var(--step-0);font-weight:500;line-height:var(--lh-body);
     -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    text-rendering:optimizeLegibility;
+    touch-action:manipulation;
   }
+
+  /* Headings set themselves rather than leaving a widow on the last line. */
+  h1,h2{text-wrap:balance}
+  p{text-wrap:pretty}
 
   /* -------------------------------------------------------- flower border
      A soft garland down both edges, fixed so it holds its place while the
@@ -49,8 +90,17 @@
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 82%,transparent 100%);
             mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 82%,transparent 100%);
   }
+  /* The PNG line is the fallback; anything that understands image-set takes
+     the WebP, which is 61% smaller. These two files are the whole of the
+     page's above-the-fold weight, and they are decoration sitting at a third
+     opacity behind everything — they have no business being half a megabyte
+     on someone's phone data. */
   .edge-l{left:-3%;background-image:url("assets/flower-left.png")}
   .edge-r{right:-3%;background-image:url("assets/flower-right.png")}
+  .edge-l{background-image:image-set(url("assets/flower-left.webp") type("image/webp"),
+                                     url("assets/flower-left.png")  type("image/png"))}
+  .edge-r{background-image:image-set(url("assets/flower-right.webp") type("image/webp"),
+                                     url("assets/flower-right.png")  type("image/png"))}
   @media (max-width:760px){ .edge{width:42vw;opacity:.2} }
 
   /* ---------------------------------------------------------------- hero */
@@ -59,27 +109,37 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;padding:0 22px 12vh;
   }
-  #hero .kicker{font-size:.74rem;letter-spacing:.44em;text-transform:uppercase;
-    color:#d9b871;opacity:.92;margin:0 0 14px;padding-left:.44em}
+  #hero .kicker{font-size:var(--step--2);letter-spacing:.44em;text-transform:uppercase;
+    font-weight:600;color:#d9b871;opacity:.92;margin:0 0 14px;padding-left:.44em}
   #hero h1{font-family:"Great Vibes",cursive;font-weight:400;
-    font-size:clamp(2.8rem,12vw,5.4rem);line-height:1.02;margin:0;color:#f6e7c8;
+    font-size:var(--step-4);line-height:var(--lh-display);margin:0;color:#f6e7c8;
     text-shadow:0 2px 30px rgba(217,184,113,.4)}
   .rule{width:min(62%,320px);height:1px;margin:20px auto 0;
     background:linear-gradient(90deg,transparent,#c9a25f,transparent)}
   #hero .lede{
-    margin:22px auto 0;max-width:26ch;
-    font-size:clamp(1.02rem,2.9vw,1.28rem);line-height:1.62;color:#dcc9a6;font-style:italic;
+    margin:22px auto 0;max-width:30ch;
+    font-size:var(--step-1);line-height:1.62;color:#dcc9a6;font-style:italic;font-weight:500;
   }
   #hero .lede em{font-style:italic;color:#f2ddb4}
 
   button{
-    font-family:inherit;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;
+    font-family:inherit;font-size:var(--step--2);font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;
     padding:12px 20px;border-radius:999px;cursor:pointer;
     border:1px solid #a8814a;background:rgba(168,129,74,.12);color:#f0dcb6;
     transition:background .2s ease,transform .12s ease;-webkit-tap-highlight-color:transparent;
   }
   button:active{transform:scale(.97)}
   button[hidden]{display:none!important}
+  button:hover{background:rgba(168,129,74,.24);border-color:#c9a25f}
+
+  /* There was no focus style anywhere on this page: tabbing to Begin or to
+     Resume changed nothing on screen. :focus-visible rather than :focus so a
+     mouse click doesn't leave a ring behind it. */
+  :focus-visible{
+    outline:2px solid #e6c98a;outline-offset:3px;border-radius:4px;
+  }
+  #start:focus-visible{outline-offset:6px}
 
   /* The dot the story starts from — the head of the road, at rest. */
   /* column-reverse: the word reads above the dot, so the road can leave the
@@ -102,7 +162,8 @@
   #cue{
     position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);
     transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;
-    color:#b4915c;font-size:.68rem;letter-spacing:.32em;text-transform:uppercase;
+    color:#b4915c;font-size:var(--step--2);font-weight:600;
+    letter-spacing:.3em;text-transform:uppercase;
     transition:opacity .5s ease;pointer-events:none;white-space:nowrap;
   }
   #cue.gone{opacity:0}
@@ -155,7 +216,7 @@
      column 2, and the frame and the words get pushed onto rows of their own. */
   .chapter .relics{grid-column:1;grid-row:1;justify-self:end}
   .chapter .plate {grid-column:2;grid-row:1}
-  .chapter .said  {grid-column:3;grid-row:1;justify-self:start;max-width:34ch}
+  .chapter .said  {grid-column:3;grid-row:1;justify-self:start;max-width:var(--measure)}
   /* every other chapter mirrors, so the road can zig-zag between them */
   .chapter.flip .relics{grid-column:3;justify-self:start}
   .chapter.flip .said  {grid-column:1;justify-self:end;text-align:right}
@@ -220,7 +281,7 @@
     box-shadow:0 1px 3px rgba(0,0,0,.4) inset, 0 0 0 1px rgba(201,162,95,.28) inset;
   }
   .instax .shot.blank span{
-    font-family:"Great Vibes",cursive;font-size:clamp(1.3rem,3.6vw,1.9rem);
+    font-family:"Great Vibes",cursive;font-size:var(--step-2);
     color:#e8cf9c;text-align:center;line-height:1.25;
     text-shadow:0 2px 14px rgba(0,0,0,.7);
   }
@@ -228,15 +289,18 @@
      print itself, so it needs to be legible at arm's length, not decorative */
   .instax .when{
     position:absolute;left:0;right:0;bottom:8%;text-align:center;
-    font-size:clamp(.95rem,2.4vw,1.18rem);letter-spacing:.1em;
+    font-size:var(--step-0);letter-spacing:.08em;
     font-weight:600;color:#6d4f31;
   }
 
   /* --- the words --- */
   .said h2{font-family:"Great Vibes",cursive;font-weight:400;
-    font-size:clamp(1.7rem,4.4vw,2.5rem);margin:0 0 10px;color:#f2ddb4;line-height:1.05}
-  .said p{margin:0;font-size:clamp(.98rem,2.4vw,1.14rem);line-height:1.6;color:#d8c6a6}
-  .said .yr{display:block;font-size:clamp(.95rem,2.5vw,1.15rem);letter-spacing:.26em;
+    font-size:var(--step-2);margin:0 0 10px;color:#f2ddb4;line-height:var(--lh-display)}
+  .said p{margin:0;font-size:var(--step-0);line-height:var(--lh-body);
+    font-weight:500;color:#d8c6a6}
+  /* step-0, not step--1: these dates were explicitly enlarged once already
+     for being unreadable, and the scale must not quietly undo that. */
+  .said .yr{display:block;font-size:var(--step-0);letter-spacing:var(--track-caps);
     text-transform:uppercase;font-weight:600;color:#d9b871;margin:0 0 12px}
 
   /* --- artifacts --- */
@@ -305,18 +369,30 @@
   /* ------------------------------------------------------------- welcome */
   #welcome{position:relative;z-index:2;text-align:center;
     padding:16vh 22px calc(env(safe-area-inset-bottom) + 14vh)}
-  #welcome .w-k{margin:0 0 16px;font-size:clamp(.72rem,2.2vw,.84rem);letter-spacing:.34em;
-    text-transform:uppercase;color:#c9a25f}
+  #welcome .w-k{margin:0 0 16px;font-size:var(--step--2);letter-spacing:.34em;
+    font-weight:600;text-transform:uppercase;color:#c9a25f}
   #welcome h2{font-family:"Great Vibes",cursive;font-weight:400;
-    font-size:clamp(2.4rem,10vw,4.4rem);margin:0;color:#f6e7c8;
+    font-size:var(--step-4);margin:0;color:#f6e7c8;
     text-shadow:0 2px 30px rgba(217,184,113,.4)}
-  #welcome .w-invite{margin:24px auto 0;max-width:34ch;
-    font-size:clamp(1rem,2.7vw,1.18rem);line-height:1.66;color:#dcc9a6;font-style:italic}
-  #welcome .w-when{margin:30px 0 0;font-size:clamp(1.02rem,3vw,1.24rem);
-    letter-spacing:.08em;color:#e8d3a8}
+  #welcome .w-invite{margin:24px auto 0;max-width:var(--measure);
+    font-size:var(--step-1);line-height:1.66;color:#dcc9a6;font-style:italic;font-weight:500}
+  #welcome .w-when{margin:30px 0 0;font-size:var(--step-1);
+    letter-spacing:.06em;color:#e8d3a8}
   #welcome .w-when b{font-weight:600;color:#f7e9cc}
-  #welcome .w-sub{margin:6px 0 0;font-size:clamp(.84rem,2.4vw,.96rem);
-    letter-spacing:.2em;color:#b99a72;font-style:italic}
+  /* Below this width the date and the time can't share a line. Rather than
+     let the separator dangle at the end of one line or lead the next, it goes
+     away entirely and the two simply stack. */
+  @media (max-width:560px){
+    #welcome .w-when .sep{display:none}
+    #welcome .w-when .at{display:block;margin-top:2px}
+  }
+  #welcome .w-sub{margin:6px 0 0;font-size:var(--step--1);
+    letter-spacing:.18em;color:#b99a72;font-style:italic}
+
+  .sr-only{
+    position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;
+  }
 
   /* ------------------------------------------------------------- countdown */
   #count{
@@ -330,15 +406,15 @@
     width:1px;background:linear-gradient(180deg,transparent,rgba(201,162,95,.42),transparent);
   }
   #count b{
-    font-weight:400;font-size:clamp(2rem,7vw,3.1rem);line-height:1;color:#f6e7c8;
+    font-weight:400;font-size:var(--step-3);line-height:1;color:#f6e7c8;
     font-variant-numeric:tabular-nums;text-shadow:0 2px 24px rgba(217,184,113,.35);
   }
   #count span{
-    margin-top:9px;font-size:clamp(.6rem,1.9vw,.68rem);letter-spacing:.3em;
+    margin-top:9px;font-size:var(--step--2);letter-spacing:.22em;font-weight:600;
     text-transform:uppercase;color:#b4915c;
   }
   #count.done .arrived{
-    font-family:"Great Vibes",cursive;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#f2ddb4;
+    font-family:"Great Vibes",cursive;font-size:var(--step-3);color:#f2ddb4;
   }
 
   /* ------------------------------------------------- playback controls */
@@ -347,8 +423,50 @@
     transform:translateX(-50%);z-index:20;display:none;gap:8px;
   }
   #playbar.show{display:flex}
-  #playbar button{padding:9px 16px;font-size:.68rem;letter-spacing:.2em;
-    background:rgba(12,4,8,.82);border-color:rgba(168,129,74,.42)}
+  #playbar button{padding:10px 18px;font-size:var(--step--2);letter-spacing:.2em;
+    background:rgba(12,4,8,.88);border-color:rgba(168,129,74,.5)}
+
+  /* --------------------------------------------------------------- sound */
+  #sound[hidden]{display:none}
+  #sound{
+    position:fixed;top:calc(env(safe-area-inset-top) + 14px);
+    right:calc(env(safe-area-inset-right) + 14px);
+    z-index:30;display:flex;align-items:center;gap:10px;
+  }
+  #sound-btn{
+    width:42px;height:42px;padding:0;border-radius:50%;
+    display:grid;place-items:center;
+    background:rgba(12,4,8,.72);border:1px solid rgba(168,129,74,.42);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  #sound-btn:hover{background:rgba(24,9,14,.86);border-color:#c9a25f}
+  /* A speaker, because this is a mute control and that is the shape people
+     already know. Muted carries a slash, so the state is told by shape and
+     not by a colour difference alone. */
+  #sound-btn .ico{width:21px;height:21px;display:block;overflow:visible}
+  #sound-btn .ico .body{fill:#d9b871}
+  #sound-btn .ico .w1,#sound-btn .ico .w2{
+    fill:none;stroke:#d9b871;stroke-width:1.8;stroke-linecap:round;
+    opacity:1;transition:opacity .2s ease;
+  }
+  #sound-btn .ico .slash{
+    fill:none;stroke:#e6c98a;stroke-width:2;stroke-linecap:round;
+    opacity:1;transition:opacity .2s ease;
+  }
+  #sound-btn[aria-pressed="true"] .ico .slash{opacity:0}
+  #sound-btn[aria-pressed="false"] .ico .w1,
+  #sound-btn[aria-pressed="false"] .ico .w2{opacity:.25}
+  #sound-hint{
+    font-size:var(--step--2);letter-spacing:.2em;text-transform:uppercase;
+    font-weight:600;color:#c9a25f;white-space:nowrap;
+    background:rgba(12,4,8,.72);border:1px solid rgba(168,129,74,.3);
+    padding:7px 13px;border-radius:999px;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    animation:hintIn .5s ease both;
+  }
+  #sound-hint[hidden]{display:none}
+  @keyframes hintIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+  #tracks{position:absolute;width:0;height:0;overflow:hidden}
 
   @media (prefers-reduced-motion:reduce){
     #start .seed,#cue .chev{animation:none}
@@ -362,8 +480,8 @@
 <div class="edge edge-r" aria-hidden="true"></div>
 
 <header id="hero">
-  <p class="kicker">Shiva &amp; Meena</p>
-  <h1>Here's a story</h1>
+  <p class="kicker">Shiva &amp; Meena</p>
+  <h1>Here’s a story</h1>
   <div class="rule"></div>
   <p class="lede">Before there was an invitation, there were five years.
     Let us show you <em>where it all started</em>.</p>
@@ -382,41 +500,66 @@
 
 <section id="welcome">
   <p class="w-k">One page still to be written</p>
-  <h2>Shiva &amp; Meena</h2>
+  <h2>Shiva &amp; Meena</h2>
   <p class="w-invite">You have come all this way with us. There is one evening left in the
     story, and it is the one we would most like you in — come, eat with us, and stay late.</p>
-  <p class="w-when"><b>Sunday, 25 October 2026</b> · 6 PM onwards</p>
+  <p class="w-when"><b>Sunday, 25 October 2026</b><span class="sep"> · </span><span class="at">6 PM onwards</span></p>
   <p class="w-sub">Wedding Reception</p>
 
-  <div id="count" aria-label="Time remaining until the reception">
-    <div class="unit"><b id="cd-d">--</b><span>days</span></div>
-    <div class="unit"><b id="cd-h">--</b><span>hours</span></div>
-    <div class="unit"><b id="cd-m">--</b><span>minutes</span></div>
-    <div class="unit"><b id="cd-s">--</b><span>seconds</span></div>
+  <!-- Four numbers ticking once a second are noise read aloud, so the digits
+       are hidden from assistive tech and one sentence, rewritten only when the
+       day changes, carries the same information. aria-live is off on purpose. -->
+  <div id="count" role="group" aria-labelledby="count-label" aria-live="off">
+    <p id="count-label" class="sr-only">Time remaining until the reception</p>
+    <div class="unit" aria-hidden="true"><b id="cd-d">--</b><span>days</span></div>
+    <div class="unit" aria-hidden="true"><b id="cd-h">--</b><span>hours</span></div>
+    <div class="unit" aria-hidden="true"><b id="cd-m">--</b><span>minutes</span></div>
+    <div class="unit" aria-hidden="true"><b id="cd-s">--</b><span>seconds</span></div>
+    <p id="cd-spoken" class="sr-only"></p>
   </div>
 </section>
 
 <div id="playbar"><button id="resume">Resume</button></div>
 
+<div id="sound" hidden>
+  <button id="sound-btn" aria-pressed="false" aria-label="Turn the music on">
+    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path class="body" d="M4 9.5h3.4L12 5.4v13.2L7.4 14.5H4z"/>
+      <path class="w1" d="M15.4 9.6a3.6 3.6 0 0 1 0 4.8"/>
+      <path class="w2" d="M18 7.2a7.2 7.2 0 0 1 0 9.6"/>
+      <path class="slash" d="M4.6 4.6 19.4 19.4"/>
+    </svg>
+  </button>
+  <span id="sound-hint" hidden>Tap for sound</span>
+</div>
+<div id="tracks" aria-hidden="true"></div>
+
 <script>
 // ===================================================================== story
 const CHAPTERS = [
   { id:'2021-college',    yr:'2021',             t:'Where it started',
-    c:'College of Engineering, Guindy. Friends first, and in no hurry about it.', n:2 },
-  { id:'2022-two-cities', yr:'January 2022',     t:'Two cities',
-    c:'Him to Chennai, her to Bengaluru. The overnight train out of MGR Central, and every excuse to be on it.', n:2 },
+    c:'College of Engineering, Guindy. Friends first, and in no hurry about it.', n:2,
+    alt:'Shiva and Meena sitting together on the steps of the red brick College of Engineering building in Guindy, books open on their laps, laughing at something between them.' },
+  { id:'2022-two-cities', yr:'January\u00a02022',  t:'Two cities',
+    c:'Him to Chennai, her to Bengaluru. The overnight train out of MGR\u00a0Central, and every excuse to be on it.', n:2,
+    alt:'Meena on the platform at Chennai MGR Central with the overnight train to Bengaluru behind her, bag in hand.' },
   { id:'2023-she-said-yes', yr:'2023',           t:'She said yes',
-    c:'It took a while to ask. It took her less time to answer.', n:2 },
+    c:'It took a while to ask. It took her less time to answer.', n:2,
+    alt:'The two of them at a rooftop table at dusk, string lights and the city skyline behind, Shiva holding out a small bunch of flowers.' },
   { id:'2024-long-way',   yr:'2024',             t:'The long way round',
-    c:'Calls that ran past midnight, video calls left on while we worked, weekends that turned up unannounced.', n:3 },
+    c:'Calls that ran past midnight, video calls left on while we worked, weekends that turned up unannounced.', n:3,
+    alt:'Shiva and Meena walking through a lit shopping street in Bengaluru in the evening, drinks in hand and bags between them.' },
   { id:'2025-coming-home',yr:'2025',             t:'Coming home',
-    c:'She moved back to Chennai. This time there were families to convince, and we did it side by side.', n:2 },
+    c:'She moved back to Chennai. This time there were families to convince, and we did it side by side.', n:2,
+    alt:'The two of them on a Chennai terrace in the afternoon, washing lines and palm trees behind, standing close and looking at each other.' },
   { id:'2026-yes',        yr:'2026',             t:'Both families said yes',
-    c:"It wasn't easy. It was worth every difficult conversation.", n:2 },
-  { id:'2026-engagement', yr:'18 June 2026',     t:'The engagement',
-    c:'A ring, her left hand, and both families in one room at last.', n:2 },
+    c:'It wasn\u2019t easy. It was worth every difficult conversation.', n:2,
+    alt:'Shiva and Meena in traditional dress beside a lit brass lamp, a tray of offerings in front of them.' },
+  { id:'2026-engagement', yr:'18\u00a0June\u00a02026', t:'The engagement',
+    c:'A ring, her left hand, and both families in one room at last.', n:2,
+    alt:'At the engagement, Shiva slipping a ring onto Meena\u2019s left hand, both of them in garlands, she in a dark green and gold kanjivaram and he in a dusty rose kurta.' },
   // The last frame is deliberately empty — this one hasn't happened yet.
-  { id:'2026-reception',  yr:'25 October 2026',  t:'The reception',
+  { id:'2026-reception',  yr:'25\u00a0October\u00a02026',  t:'The reception',
     c:'', n:2, empty:'Come and be in it.' }
 ];
 
@@ -454,9 +597,17 @@ CHAPTERS.forEach((ch, i) => {
   plate.className = 'plate';
   // The last chapter has no photograph on purpose: that evening hasn't
   // happened yet, so the frame stands empty and asks you to come and fill it.
+  // width/height are declared so the browser reserves the square before the
+  // file lands. Without them every chapter grew as its photograph arrived,
+  // which is what kept knocking the road out of shape mid-scroll.
+  // The first photograph is what the trail leads to, so it is not deferred.
+  const eager = i === 0;
   const inside = ch.empty
-    ? '<div class="shot blank"><span>' + ch.empty + '</span></div>'
-    : '<div class="shot"><img src="assets/story/' + ch.id + '.jpg" alt="" loading="lazy"></div>';
+    ? '<div class="shot blank" role="img" aria-label="An empty frame, waiting. ' + ch.empty + '">' +
+        '<span aria-hidden="true">' + ch.empty + '</span></div>'
+    : '<div class="shot"><img src="assets/story/' + ch.id + '.jpg" width="760" height="760"' +
+        ' alt="' + ch.alt.replace(/"/g, '&quot;') + '"' +
+        (eager ? ' fetchpriority="high">' : ' loading="lazy" decoding="async">') + '</div>';
   plate.innerHTML =
     '<div class="pin"><span class="cast"></span><span class="dome"></span><span class="glint"></span></div>' +
     '<div class="hang"><div class="instax">' + inside +
@@ -621,6 +772,7 @@ function wake() { if (!rafOn) { rafOn = true; lastT = performance.now(); request
 // input from the guest hands control straight back — being dragged down a
 // page you are trying to read is horrible.
 const playbar = document.getElementById('playbar');
+const resumeBtn = document.getElementById('resume');
 let autoPlaying = false, autoIdx = 0, autoStop = null;
 
 function easeTo(y, ms) {
@@ -638,7 +790,17 @@ function easeTo(y, ms) {
 const sleep = ms => new Promise(r => { autoStop = setTimeout(r, ms); });
 
 async function play(from) {
-  autoPlaying = true; playbar.classList.remove('show'); wake();
+  autoPlaying = true; wake();
+  // Forty seconds of animated scrolling is by far the most motion on this
+  // page, and it was the one thing not checking the setting. Someone who has
+  // asked for reduced motion gets taken to the start of the story and left to
+  // read it at their own pace.
+  if (reduced) {
+    chapters[0].scrollIntoView();
+    autoPlaying = false; setPlaybar('hidden');
+    return;
+  }
+  setPlaybar('playing');
   for (autoIdx = from; autoIdx < chapters.length; autoIdx++) {
     const c = chapters[autoIdx];
     const y = c.getBoundingClientRect().top + scrollY - (innerHeight - c.offsetHeight) / 2;
@@ -648,22 +810,43 @@ async function play(from) {
   }
   const w = document.getElementById('welcome');
   await easeTo(w.getBoundingClientRect().top + scrollY - innerHeight * 0.2, 1600);
-  autoPlaying = false;
+  autoPlaying = false; setPlaybar('hidden');
+}
+// Motion that runs for more than a few seconds needs a control that says so.
+// Scrolling or pressing a key still stops the playback, but a guest shouldn't
+// have to discover that — while it is running there is a Pause button on
+// screen, and once stopped the same button offers to carry on.
+function setPlaybar(state) {
+  playbar.classList.toggle('show', state !== 'hidden');
+  resumeBtn.textContent = state === 'playing' ? 'Pause' : 'Resume';
+  resumeBtn.setAttribute('aria-label',
+    state === 'playing' ? 'Pause the guided tour of the story'
+                        : 'Continue the guided tour of the story');
 }
 function halt() {
   if (!autoPlaying) return;
   autoPlaying = false; clearTimeout(autoStop);
-  playbar.classList.add('show');
+  setPlaybar('paused');
 }
 ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(
-  e => addEventListener(e, halt, { passive: true }));
+  e => addEventListener(e, ev => {
+    if (ev.target && ev.target.closest && ev.target.closest('#playbar')) return;
+    halt();
+  }, { passive: true }));
 
 document.getElementById('start').addEventListener('click', () => {
-  const y = storyEl.getBoundingClientRect().top + scrollY;
+  const y = storyEl.getBoundingClientRect().top + scrollY - innerHeight * 0.08;
+  // play() checks the motion setting, but this opening glide ran before it and
+  // animated regardless — the one bit of the journey that still moved for a
+  // guest who had asked for stillness.
+  if (reduced) { scrollTo(0, Math.max(0, y)); play(0); return; }
   autoPlaying = true;
-  easeTo(y - innerHeight * 0.08, 900).then(() => play(0));
+  easeTo(y, 900).then(() => play(0));
 });
-document.getElementById('resume').addEventListener('click', () => play(autoIdx));
+resumeBtn.addEventListener('click', () => {
+  if (autoPlaying) { halt(); return; }   // the same button is Pause while running
+  play(autoIdx);
+});
 
 // ---------------------------------------------------------------- wiring
 addEventListener('scroll', () => { onScroll(); wake(); }, { passive: true });
@@ -693,19 +876,32 @@ const countEl = document.getElementById('count');
 const cd = { d: document.getElementById('cd-d'), h: document.getElementById('cd-h'),
              m: document.getElementById('cd-m'), s: document.getElementById('cd-s') };
 const pad = n => String(n).padStart(2, '0');
+const spokenEl = document.getElementById('cd-spoken');
+let spokenDays = -1;
 
 function drawCount() {
   const ms = TARGET - Date.now();
   if (ms <= 0) {
     countEl.className = 'done';
     countEl.innerHTML = '<span class="arrived">Today is the day</span>';
+    countEl.removeAttribute('aria-labelledby');
+    countEl.setAttribute('aria-label', 'Today is the day of the reception.');
     return false;
   }
-  const sec = Math.floor(ms / 1000);
-  cd.d.textContent = Math.floor(sec / 86400);
+  const sec  = Math.floor(ms / 1000);
+  const days = Math.floor(sec / 86400);
+  cd.d.textContent = days;
   cd.h.textContent = pad(Math.floor(sec / 3600) % 24);
   cd.m.textContent = pad(Math.floor(sec / 60) % 60);
   cd.s.textContent = pad(sec % 60);
+
+  // rewritten only when the day rolls over, not sixty times a minute
+  if (days !== spokenDays) {
+    spokenDays = days;
+    spokenEl.textContent = days === 0
+      ? 'Less than a day until the reception.'
+      : days + (days === 1 ? ' day' : ' days') + ' until the reception.';
+  }
   return true;
 }
 
@@ -725,6 +921,209 @@ addEventListener('visibilitychange', () => {
   const r = welcomeEl.getBoundingClientRect();
   runCount(!document.hidden && r.top < innerHeight && r.bottom > 0);
 });
+// ===================================================================== sound
+// One looping track per section, crossfaded by scroll position. Nothing here
+// is driven by "entered" or "left" events: every track is given a weight each
+// frame from how centred its section is in the viewport, and the weights are
+// normalised into volumes. That makes scrolling up behave exactly like
+// scrolling down for free, and means a guest parked between two chapters
+// genuinely hears both.
+//
+// A missing file is not an error. Tracks that fail to load are dropped and the
+// rest carry on, so the mp3s can be added to assets/audio one at a time.
+
+const AUDIO_DIR = 'assets/audio/';
+
+// hero.mp3 is anchored to two places — the story opens and closes on it.
+const TRACK_DEFS = [
+  { file: 'hero', anchors: [document.getElementById('hero'), welcomeEl] },
+  ...CHAPTERS.map((ch, i) => ({ file: ch.id, anchors: [chapters[i]] }))
+];
+
+const trackBox = document.getElementById('tracks');
+const soundBtn = document.getElementById('sound-btn');
+const soundHint = document.getElementById('sound-hint');
+
+const tracks = TRACK_DEFS.map(def => ({
+  file: def.file,
+  anchors: def.anchors.filter(Boolean),
+  el: null,        // created on first approach, not at page load
+  gain: 0,         // what we are actually playing at
+  shaped: 0,       // target raised to the focus power, before normalising
+  target: 0,       // what the scroll position says we should be at
+  dead: false      // file missing or refused to decode
+}));
+
+let soundOn = false;       // the guest's choice
+let master = 0;            // eased 0..1, so muting is a fade and not a cut
+let audioRaf = 0;
+
+// --- remember the choice, but never let a storage failure break the page ---
+const remember = v => { try { localStorage.setItem('wed-sound', v); } catch (e) {} };
+const recall = () => { try { return localStorage.getItem('wed-sound'); } catch (e) { return null; } };
+
+// The falloff has to be measured against the distance between one chapter and
+// the next, not against the height of the screen. Tied to the viewport, a
+// chapter sitting dead centre still had its neighbour at half volume — and on
+// the last chapter six tracks were audible at once. Tied to the spacing, a
+// centred chapter reaches full volume with its neighbours at zero, and the
+// midpoint between two lands at exactly half weight each, which is the proper
+// crossfade.
+let gap = 800;
+function measureGap() {
+  const mids = chapters.map(c => {
+    const r = c.getBoundingClientRect();
+    return r.top + scrollY + r.height / 2;
+  });
+  let sum = 0;
+  for (let i = 1; i < mids.length; i++) sum += mids[i] - mids[i - 1];
+  if (mids.length > 1) gap = Math.max(240, sum / (mids.length - 1));
+}
+
+function weigh(el) {
+  const r = el.getBoundingClientRect();
+  if (r.bottom < -innerHeight || r.top > innerHeight * 2) return 0;
+  const d = Math.abs((r.top + r.height / 2) - innerHeight / 2);
+  const near = gap * 0.15;                 // a plateau, so dead centre is steady
+  const far  = gap * 0.85;
+  if (d <= near) return 1;
+  if (d >= far) return 0;
+  const t = (d - near) / (far - near);
+  return 1 - t * t * (3 - 2 * t);          // smoothstep, so no kink at the edges
+}
+
+// Only fetch a track when its section is within a screen and a half. A guest
+// who reads two chapters and leaves never pays for the other seven.
+function ensureLoaded(t) {
+  if (t.el || t.dead) return;
+  // Far enough ahead that the next track is buffered before it is wanted,
+  // close enough that reading two chapters does not drag down seven files.
+  const close = t.anchors.some(a => {
+    const r = a.getBoundingClientRect();
+    return r.top < innerHeight + gap * 1.1 && r.bottom > -gap * 0.8;
+  });
+  if (!close) return;
+
+  const el = document.createElement('audio');
+  el.src = AUDIO_DIR + t.file + '.mp3';
+  el.loop = true;
+  el.preload = 'auto';
+  el.volume = 0;
+  el.addEventListener('error', () => { t.dead = true; t.el = null; el.remove(); });
+  trackBox.appendChild(el);
+  t.el = el;
+}
+
+// Eased per second rather than per frame. Tied to frames, the same crossfade
+// ran at half speed on a 30fps phone and twice as fast on a 120Hz one.
+let audioLast = 0;
+const approach = (cur, want, rate, dt) => cur + (want - cur) * (1 - Math.exp(-rate * dt));
+
+function audioFrame(now) {
+  audioRaf = 0;
+  const dt = audioLast ? Math.min((now - audioLast) / 1000, 0.1) : 0.016;
+  audioLast = now;
+
+  if (!soundOn && master < 0.001) {            // fully faded out: stop the loop
+    tracks.forEach(t => { if (t.el && !t.el.paused) t.el.pause(); });
+    audioLast = 0;
+    return;
+  }
+  master = approach(master, soundOn ? 1 : 0, 6, dt);
+
+  measureGap();
+  let total = 0;
+  for (const t of tracks) {
+    ensureLoaded(t);
+    t.target = t.dead ? 0 : Math.max(...t.anchors.map(weigh));
+    // Raised to a power before the weights are normalised, so the nearer
+    // chapter wins decisively instead of politely. Sharing the weights raw
+    // left the previous track at 0.42 when the next chapter was already three
+    // quarters of the way in — clearly audible under it. Cubed, the same
+    // point sits at 0.01, while the crossover at the exact midway mark is
+    // untouched, so the handover is still a crossfade and not a cut.
+    t.shaped = Math.pow(t.target, 3);
+    total += t.shaped;
+  }
+
+  for (const t of tracks) {
+    // Equal power rather than equal amplitude: two tracks at half volume each
+    // sound quieter than one at full, so the handover would sag in the middle.
+    const want = total > 0 ? Math.sqrt(t.shaped / total) * master : 0;
+    t.gain = approach(t.gain, want, 7, dt);    // eased, so scroll jitter can't buzz
+    if (!t.el) continue;
+    if (t.gain > 0.004) {
+      t.el.volume = Math.min(1, t.gain);
+      if (t.el.paused) t.el.play().catch(() => {});
+    } else if (!t.el.paused) {
+      t.el.volume = 0;
+      t.el.pause();
+    }
+  }
+  audioRaf = requestAnimationFrame(audioFrame);
+}
+function audioWake() { if (!audioRaf) audioRaf = requestAnimationFrame(audioFrame); }
+
+function setSound(on) {
+  soundOn = on;
+  soundBtn.setAttribute('aria-pressed', String(on));
+  soundBtn.setAttribute('aria-label', on ? 'Turn the music off' : 'Turn the music on');
+  soundHint.hidden = true;
+  remember(on ? 'on' : 'off');
+  audioWake();
+}
+
+soundBtn.addEventListener('click', () => setSound(!soundOn));
+
+// --- starting up -----------------------------------------------------------
+// Try to start on our own; browsers will usually refuse until the guest has
+// interacted, and when they do we ask rather than stay silent.
+let armed = false;
+function arm() {
+  if (armed) return;
+  armed = true;
+  setSound(true);
+}
+
+// The whole control stays hidden until we know there is actually something to
+// play, so the page can go live before the music is finished without showing
+// guests a button that does nothing.
+const soundUI = document.getElementById('sound');
+const probe = document.createElement('audio');
+probe.src = AUDIO_DIR + 'hero.mp3';
+probe.volume = 0;
+
+if (recall() === 'off') {
+  armed = true;                                 // they muted it last time
+  probe.addEventListener('canplay', () => { soundUI.hidden = false; }, { once: true });
+  probe.load();
+} else {
+  probe.play().then(() => {
+    probe.pause(); probe.remove();
+    soundUI.hidden = false;
+    arm();                                      // autoplay allowed
+  }).catch(err => {
+    probe.remove();
+    // Two very different failures land here. NotAllowedError means the browser
+    // refused to autoplay and the guest can fix that by interacting — so ask.
+    // Anything else means the file is missing or won't decode, and inviting
+    // someone to tap for sound that does not exist is worse than saying
+    // nothing. That is also the state while the mp3s are still being cut.
+    if (err && err.name !== 'NotAllowedError') { armed = true; return; }
+    soundUI.hidden = false;
+    soundHint.hidden = false;                   // blocked: invite them in
+    // Any real gesture counts, including the Begin button and the first tap
+    // on a phone. A wheel scroll does not, which is exactly why the hint is
+    // there for anyone reading on a laptop.
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+      addEventListener(ev, arm, { once: true, passive: true }));
+  });
+}
+
+// keep volumes tracking the page while it moves
+addEventListener('scroll', audioWake, { passive: true });
+addEventListener('resize', audioWake);
+addEventListener('visibilitychange', () => { if (!document.hidden) audioWake(); });
 </script>
 </body>
 </html>
