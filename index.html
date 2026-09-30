@@ -128,8 +128,6 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;padding:0 22px 12vh;
   }
-  #hero .kicker{font-size:var(--step--2);letter-spacing:.44em;text-transform:uppercase;
-    font-weight:600;color:#d9b871;opacity:.92;margin:0 0 14px;padding-left:.44em}
   #hero h1{font-family:"Great Vibes",cursive;font-weight:400;
     font-size:var(--step-4);line-height:var(--lh-display);margin:0;color:#f6e7c8;
     text-shadow:0 2px 30px rgba(217,184,113,.4)}
@@ -332,10 +330,53 @@
   .said .yr{display:block;font-size:var(--step-0);letter-spacing:var(--track-caps);
     text-transform:uppercase;font-weight:600;color:#d9b871;margin:0 0 12px}
 
+  /* --- the shooting star that reads the chapter with you ---
+     It runs under the title, then under each line of the story in turn,
+     left to right like an eye reading, and loops for as long as the chapter
+     is on screen. One small element per line, each clipped to its own line
+     so the tail never strays past the words. JS measures the lines. */
+  .said{position:relative}
+  /* The box is padded well beyond the line on every side so the head's glow
+     is never cut off square; a soft mask fades the tail in at the start of
+     the line instead of a hard clip. */
+  .said .star-line{
+    position:absolute;height:56px;margin-top:-28px;pointer-events:none;opacity:0;
+    --pad:28px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent calc(var(--pad) - 12px),#000 calc(var(--pad) + 18px),#000 100%);
+            mask-image:linear-gradient(90deg,transparent 0,transparent calc(var(--pad) - 12px),#000 calc(var(--pad) + 18px),#000 100%);
+  }
+  .said .star-line i{
+    position:absolute;top:50%;left:var(--pad);right:var(--pad);height:0;transform:translateX(-100%);
+  }
+  .said .star-line i::before{          /* the tail */
+    content:"";position:absolute;right:3px;top:-.75px;width:min(55%,140px);height:1.5px;
+    border-radius:2px;
+    background:linear-gradient(90deg,rgba(217,184,113,0),rgba(233,201,138,.5) 70%,rgba(255,240,205,.95));
+  }
+  .said .star-line i::after{           /* the head */
+    content:"";position:absolute;right:-3px;top:-3px;width:6px;height:6px;border-radius:50%;
+    background:radial-gradient(circle,#fffaf0 0%,#f6e3b4 35%,rgba(233,190,110,0) 72%);
+    box-shadow:0 0 8px 2px rgba(246,220,160,.75),0 0 18px 5px rgba(217,184,113,.35);
+  }
+
+  /* --- hearts that fly out from behind a print when it's liked --- */
+  .plate .burst{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible}
+  .plate .burst img{position:absolute;left:0;top:0;opacity:0;will-change:transform,opacity;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.35))}
+  .plate .hang{position:relative;z-index:1}
+  .instax{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+
   /* --- artifacts --- */
-  .relics{display:flex;flex-wrap:wrap;gap:12px;max-width:230px;justify-content:center}
+  /* align-items:center matters: a flex row stretches every item to the
+     tallest one by default, which pulled the wide rings and the motorbike up
+     to the height of the garlands. Each relic is also sized by area rather
+     than width (JS sets --k = √aspect), so a long, low ring and a tall lamp
+     read as the same weight instead of one being tiny and the other huge. */
+  .relics{display:flex;flex-wrap:wrap;gap:14px;max-width:250px;
+    justify-content:center;align-items:center;--relic:clamp(58px,7.4vw,84px)}
   .relics img{
-    width:clamp(56px,7.6vw,86px);height:auto;display:block;
+    flex:none;display:block;height:auto;object-fit:contain;
+    width:calc(var(--relic) * var(--k,1));max-width:100%;
     filter:drop-shadow(0 8px 14px rgba(0,0,0,.55));
   }
 
@@ -439,7 +480,6 @@
   #welcome .go:hover{filter:brightness(1.06);box-shadow:0 14px 36px rgba(217,184,113,.32),0 1px 0 rgba(255,245,220,.5) inset}
   #welcome .go:active{transform:scale(.97)}
   #welcome .go:focus-visible{outline:2px solid #f6e7c8;outline-offset:4px}
-  #welcome .v-hint{margin:12px 0 0;font-size:var(--step--2);color:#8f7553;font-style:italic}
 
   .sr-only{
     position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
@@ -682,8 +722,9 @@
     background:rgba(12,4,8,.72);border:1px solid rgba(168,129,74,.3);
     padding:7px 13px;border-radius:999px;
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-    animation:hintIn .5s ease both;
+    animation:hintIn .5s ease both;cursor:pointer;min-height:42px;
   }
+  #sound-hint:hover{background:rgba(24,9,14,.86);border-color:#c9a25f;color:#e6c98a}
   #sound-hint[hidden]{display:none}
   @keyframes hintIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
   #tracks{position:absolute;width:0;height:0;overflow:hidden}
@@ -701,7 +742,6 @@
 <canvas id="motes" aria-hidden="true"></canvas>
 
 <header id="hero">
-  <p class="kicker">Shiva &amp; Meena</p>
   <h1>Here’s a story</h1>
   <div class="rule"></div>
   <p class="lede">Before there was an invitation, there were five years.
@@ -750,7 +790,6 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c-3.9 0-7 3-7 6.9 0 5.1 6.1 11.3 6.4 11.6.3.3.9.3 1.2 0 .3-.3 6.4-6.5 6.4-11.6 0-3.9-3.1-6.9-7-6.9Zm0 9.5a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></svg>
       <span>Take me there</span>
     </a>
-    <p class="v-hint">Opens Google Maps with directions from where you are</p>
   </div>
 </section>
 
@@ -814,7 +853,7 @@
       <path class="slash" d="M4.6 4.6 19.4 19.4"/>
     </svg>
   </button>
-  <span id="sound-hint" hidden>Tap for sound</span>
+  <button type="button" id="sound-hint" hidden>Tap for sound</button>
 </div>
 <div id="tracks" aria-hidden="true"></div>
 
@@ -874,6 +913,13 @@ CHAPTERS.forEach((ch, i) => {
     // A relic that hasn't been drawn yet simply isn't there, rather than
     // leaving a broken-image box in the middle of the story.
     img.addEventListener('error', () => img.remove());
+    const fit = () => {
+      if (!img.naturalWidth) return;
+      const k = Math.sqrt(img.naturalWidth / img.naturalHeight);
+      img.style.setProperty('--k', Math.min(1.7, Math.max(0.62, k)).toFixed(3));
+    };
+    img.addEventListener('load', fit);
+    if (img.complete) fit();
     relics.appendChild(img);
   }
 
@@ -893,6 +939,7 @@ CHAPTERS.forEach((ch, i) => {
         ' alt="' + ch.alt.replace(/"/g, '&quot;') + '"' +
         (eager ? ' fetchpriority="high">' : ' loading="lazy" decoding="async">') + '</div>';
   plate.innerHTML =
+    '<div class="burst" aria-hidden="true"></div>' +
     '<div class="pin"><span class="cast"></span><span class="dome"></span><span class="glint"></span></div>' +
     '<div class="hang"><div class="instax">' + inside +
       '<span class="when">' + ch.yr + '</span>' +
@@ -997,6 +1044,11 @@ function onScroll() {
       // The pin lands at ~0.74s (0.44s delay + 0.3s drive). The frame is only
       // knocked sideways when the pin actually hits it, not when it pops in.
       setTimeout(() => kick(i, -1.15 - Math.random() * 0.5), reduced ? 0 : 950);
+      // The stars begin once the words have faded in, if it's still in view.
+      setTimeout(() => {
+        const r2 = c.getBoundingClientRect();
+        if (r2.bottom > 0 && r2.top < innerHeight) startStars(i);
+      }, 1500);
     }
   });
 
@@ -1021,6 +1073,144 @@ const K = 34, C = 4.6;
 let lastY = scrollY, lastT = performance.now(), rafOn = false;
 
 function kick(i, amount) { swing[i].v += amount * 6; wake(); }
+
+// Brushing past a print with the mouse nudges it the way the mouse moved —
+// harder the further from the pin you touch it, as a real hanging photo
+// would. Torque, not a fixed wobble, so it always swings the right way.
+hangs.forEach((h, i) => {
+  h.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || reduced || !chapters[i].classList.contains('seen')) return;
+    const r = h.getBoundingClientRect();
+    const px = r.left + r.width / 2, py = r.top - 15;          // the pin
+    const rx = (e.clientX - px) / r.height, ry = (e.clientY - py) / r.height;
+    const mx = Math.max(-40, Math.min(40, e.movementX || 0));
+    const my = Math.max(-40, Math.min(40, e.movementY || 0));
+    const s = swing[i];
+    s.v += (rx * my - ry * mx) * 0.2;
+    s.v = Math.max(-18, Math.min(18, s.v));
+    wake();
+  });
+});
+
+// ---- the shooting star that reads each chapter ----
+// Lines are measured from the text itself (a Range over each text node gives
+// one box per wrapped line), so it follows however the words happen to wrap
+// on this screen, and is re-measured when the fonts land or the window
+// changes size. Every line gets its own star; they share one looping clock,
+// each lit only in its own slot, so the sequence can run forever without any
+// timers to keep in step.
+const STAR_SPEED = 190;      // px per second along a line
+const STAR_MIN = 0.7;        // seconds, even for a short line
+const STAR_GAP = 0.18;       // seconds between one line and the next
+const STAR_REST = 1.8;       // seconds of stillness before it starts over
+
+function textLines(el, base) {
+  const rows = [];
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    if (!n.textContent.trim()) continue;
+    range.selectNodeContents(n);
+    for (const r of range.getClientRects()) {
+      if (r.width < 2) continue;
+      const row = rows.find(x => Math.abs(x.top - r.top) < r.height * 0.5);
+      if (row) { row.left = Math.min(row.left, r.left); row.right = Math.max(row.right, r.right); row.bottom = Math.max(row.bottom, r.bottom); }
+      else rows.push({ top: r.top, left: r.left, right: r.right, bottom: r.bottom });
+    }
+  }
+  rows.sort((a, b) => a.top - b.top);
+  return rows.map(r => ({ x: r.left - base.left, y: r.bottom - base.top, w: r.right - r.left }));
+}
+
+const stars = chapters.map(() => ({ built: false, anims: [], on: false }));
+
+function buildStars(i) {
+  if (reduced) return;
+  const said = chapters[i].querySelector('.said');
+  if (!said) return;
+  said.querySelectorAll('.star-line').forEach(x => x.remove());
+  const st = stars[i];
+  st.anims = [];
+  const base = said.getBoundingClientRect();
+  const h2 = said.querySelector('h2'), p = said.querySelector('p');
+  const lines = [...(h2 ? textLines(h2, base) : []), ...(p ? textLines(p, base) : [])];
+  if (!lines.length) return;
+
+  const slots = [];
+  let t = 0;
+  for (const ln of lines) {
+    const d = Math.max(STAR_MIN, ln.w / STAR_SPEED);
+    slots.push([t, t + d]);
+    t += d + STAR_GAP;
+  }
+  const total = t - STAR_GAP + STAR_REST;
+  const f = x => Math.min(1, Math.max(0, x / total));
+
+  lines.forEach((ln, k) => {
+    const box = document.createElement('span');
+    box.className = 'star-line';
+    box.setAttribute('aria-hidden', 'true');
+    box.style.left = (ln.x - 28) + 'px';          // 28px = --pad in the CSS
+    box.style.top = (ln.y + 4) + 'px';
+    box.style.width = (ln.w + 56) + 'px';
+    const head = document.createElement('i');
+    box.append(head);
+    said.append(box);
+
+    const [a, b] = slots[k];
+    const fadeIn = Math.min(0.2, (b - a) * 0.2), fadeOut = 0.45;
+    const oa = f(a), ob = f(b);
+    st.anims.push(head.animate([
+      { offset: 0, transform: 'translateX(-100%)' },
+      { offset: oa, transform: 'translateX(-100%)', easing: 'cubic-bezier(.33,.1,.67,.95)' },
+      { offset: ob, transform: 'translateX(0)' },
+      { offset: 1, transform: 'translateX(0)' }
+    ], { duration: total * 1000, iterations: Infinity }));
+    st.anims.push(box.animate([
+      { offset: 0, opacity: 0 },
+      { offset: oa, opacity: 0 },
+      { offset: f(a + fadeIn), opacity: 1 },
+      { offset: ob, opacity: 1 },
+      { offset: f(b + fadeOut), opacity: 0 },
+      { offset: 1, opacity: 0 }
+    ], { duration: total * 1000, iterations: Infinity }));
+  });
+  st.built = true;
+  if (!st.on) st.anims.forEach(x => x.pause());
+}
+
+// Start from the title again whenever a guest comes (back) to a chapter.
+function restartStars(i) {
+  const st = stars[i];
+  if (!st.built) return;
+  st.anims.forEach(x => { x.currentTime = 0; x.play(); });
+}
+function startStars(i) {
+  const st = stars[i];
+  st.on = true;
+  if (!st.built) buildStars(i); else restartStars(i);
+}
+function stopStars(i) {
+  const st = stars[i];
+  st.on = false;
+  st.anims.forEach(x => x.pause());
+}
+
+const starIO = new IntersectionObserver(es => es.forEach(e => {
+  const i = chapters.indexOf(e.target);
+  if (i < 0 || !chapters[i].classList.contains('seen')) return;
+  if (e.isIntersecting) startStars(i); else stopStars(i);
+}), { threshold: 0.35 });
+chapters.forEach(c => starIO.observe(c));
+
+// Line breaks move when the web fonts arrive or the window is resized, so
+// measure again then.
+let starResize = 0;
+function remeasureStars() {
+  stars.forEach((st, i) => { if (st.built) { buildStars(i); if (st.on) restartStars(i); } });
+}
+addEventListener('resize', () => { clearTimeout(starResize); starResize = setTimeout(remeasureStars, 250); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasureStars);
 
 // Only the prints actually on screen are worth integrating; the idle drift
 // would otherwise keep a rAF alive for eight frames nobody can see.
@@ -1095,7 +1285,8 @@ async function play(from) {
     const c = chapters[autoIdx];
     const y = c.getBoundingClientRect().top + scrollY - (innerHeight - c.offsetHeight) / 2;
     if (!await easeTo(Math.max(0, y), 1500)) return;
-    await sleep(5200);        // long enough to actually read the caption
+    { const k = autoIdx; setTimeout(() => { if (stars[k].built) restartStars(k); }, 300); }
+    await sleep(7200);        // long enough to read the caption and watch the star cross it
     if (!autoPlaying) return;
   }
   const w = document.getElementById('welcome');
@@ -1212,17 +1403,26 @@ addEventListener('visibilitychange', () => {
   runCount(!document.hidden && r.top < innerHeight && r.bottom > 0);
 });
 // ===================================================================== sound
-// One looping track per section, crossfaded by scroll position. Nothing here
-// is driven by "entered" or "left" events: every track is given a weight each
-// frame from how centred its section is in the viewport, and the weights are
-// normalised into volumes. That makes scrolling up behave exactly like
-// scrolling down for free, and means a guest parked between two chapters
-// genuinely hears both.
+// One looping song per section. Exactly one section is "current" at a time —
+// the one nearest the middle of the screen — and when that changes, its song
+// fades in over a couple of seconds while the previous one fades out. The
+// fades run on the clock, not on the scroll position, so they sound the same
+// whether a guest drifts slowly, flicks quickly, or the tour is driving.
 //
-// A missing file is not an error. Tracks that fail to load are dropped and the
-// rest carry on, so the mp3s can be added to assets/audio one at a time.
+// Two things phones need, which is why this doesn't just set audio.volume:
+//  • iOS ignores audio.volume entirely (it's read-only there), so every song
+//    was either full blast or cut dead. Volume goes through Web Audio gain
+//    nodes instead, which work everywhere.
+//  • iOS only lets an <audio> start playing inside a tap. Songs created later,
+//    while scrolling, were silently refused — the "chapters below were muted"
+//    bug. So the one tap on "Tap for sound" unlocks every song at once.
+//
+// Sound starts off. Nothing plays until the guest asks for it.
 
 const AUDIO_DIR = 'assets/audio/';
+const FADE_IN = 2.4;        // seconds for a song to come up
+const FADE_OUT = 1.8;       // seconds for the previous one to go
+const MASTER_FADE = 0.7;    // seconds for the mute button's fade
 
 // hero.mp3 opens the story. The last chapter's song (the reception) is held
 // once you scroll past it, so it carries on through the welcome and to the
@@ -1235,190 +1435,174 @@ const TRACK_DEFS = [
 const trackBox = document.getElementById('tracks');
 const soundBtn = document.getElementById('sound-btn');
 const soundHint = document.getElementById('sound-hint');
+const soundUI = document.getElementById('sound');
 
 const tracks = TRACK_DEFS.map(def => ({
   file: def.file,
   anchors: def.anchors.filter(Boolean),
-  hold: !!def.hold,  // stays at full once scrolled past (the last chapter)
-  el: null,        // created on first approach, not at page load
-  gain: 0,         // what we are actually playing at
-  shaped: 0,       // target raised to the focus power, before normalising
-  target: 0,       // what the scroll position says we should be at
-  dead: false      // file missing or refused to decode
+  hold: !!def.hold,
+  el: null, node: null,   // <audio> and its Web Audio gain
+  level: 0,               // 0..1 linear fade position
+  dead: false
 }));
 
-let soundOn = false;       // the guest's choice
-let master = 0;            // eased 0..1, so muting is a fade and not a cut
-let audioRaf = 0;
+let actx = null;           // AudioContext, created by the first tap
+let soundOn = false;
+let master = 0;
+let current = null;        // the track whose section is in view
+let audioRaf = 0, audioLast = 0;
 
-// --- remember the choice, but never let a storage failure break the page ---
-const remember = v => { try { localStorage.setItem('wed-sound', v); } catch (e) {} };
-const recall = () => { try { return localStorage.getItem('wed-sound'); } catch (e) { return null; } };
+function makeEl(t) {
+  if (t.el || t.dead) return;
+  const el = document.createElement('audio');
+  el.src = AUDIO_DIR + t.file + '.mp3';
+  el.loop = true;
+  el.preload = 'auto';
+  el.playsInline = true;
+  el.setAttribute('playsinline', '');
+  el.addEventListener('error', () => { t.dead = true; });
+  trackBox.appendChild(el);
+  t.el = el;
+  if (actx) {
+    try {
+      const src = actx.createMediaElementSource(el);
+      t.node = actx.createGain();
+      t.node.gain.value = 0;
+      src.connect(t.node).connect(actx.destination);
+    } catch (e) { t.node = null; }
+  }
+  if (!t.node) el.volume = 0;
+}
 
-// The falloff has to be measured against the distance between one chapter and
-// the next, not against the height of the screen. Tied to the viewport, a
-// chapter sitting dead centre still had its neighbour at half volume — and on
-// the last chapter six tracks were audible at once. Tied to the spacing, a
-// centred chapter reaches full volume with its neighbours at zero, and the
-// midpoint between two lands at exactly half weight each, which is the proper
-// crossfade.
+// Must run inside the tap itself.
+function unlock() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!actx && AC) { try { actx = new AC(); } catch (e) { actx = null; } }
+  if (actx && actx.state !== 'running') actx.resume().catch(() => {});
+  measureGap();
+  current = pickCurrent();
+  // The first tap should answer at once: the song for where they are comes up
+  // with the button's own short fade, not the slower chapter-to-chapter one.
+  if (master === 0) tracks.forEach(t => { t.level = t === current ? 1 : 0; });
+  for (const t of tracks) {
+    if (t.unlocked || t.dead) continue;
+    makeEl(t);
+    if (!t.el) continue;
+    // play() inside the gesture is what earns this element the right to play
+    // later; the ones not needed yet are paused again straight away.
+    const p = t.el.play();
+    t.unlocked = true;
+    if (t !== current) { if (p && p.then) p.then(() => { if (t.level === 0) t.el.pause(); }, () => {}); }
+    else if (p && p.catch) p.catch(() => {});
+  }
+}
+
+// gap: the typical distance between two chapters, for the hand-over margin.
 let gap = 800;
 function measureGap() {
-  const mids = chapters.map(c => {
-    const r = c.getBoundingClientRect();
-    return r.top + scrollY + r.height / 2;
-  });
+  const mids = chapters.map(c => { const r = c.getBoundingClientRect(); return r.top + scrollY + r.height / 2; });
   let sum = 0;
   for (let i = 1; i < mids.length; i++) sum += mids[i] - mids[i - 1];
   if (mids.length > 1) gap = Math.max(240, sum / (mids.length - 1));
 }
 
-function weigh(el, hold) {
-  const r = el.getBoundingClientRect();
-  const off = (r.top + r.height / 2) - innerHeight / 2;   // < 0: scrolled past it
-  if (hold && off <= 0) return 1;
-  if (r.bottom < -innerHeight || r.top > innerHeight * 2) return 0;
-  const d = Math.abs(off);
-  const near = gap * 0.15;                 // a plateau, so dead centre is steady
-  const far  = gap * 0.85;
-  if (d <= near) return 1;
-  if (d >= far) return 0;
-  const t = (d - near) / (far - near);
-  return 1 - t * t * (3 - 2 * t);          // smoothstep, so no kink at the edges
-}
-
-// Only fetch a track when its section is within a screen and a half. A guest
-// who reads two chapters and leaves never pays for the other seven.
-function ensureLoaded(t) {
-  if (t.el || t.dead) return;
-  // Far enough ahead that the next track is buffered before it is wanted,
-  // close enough that reading two chapters does not drag down seven files.
-  const close = t.anchors.some(a => {
+// How far a track's section is from the middle of the screen. The reception
+// counts as "here" for everything below it.
+function distance(t) {
+  let best = Infinity;
+  for (const a of t.anchors) {
     const r = a.getBoundingClientRect();
-    return r.top < innerHeight + gap * 1.1 && (t.hold || r.bottom > -gap * 0.8);
-  });
-  if (!close) return;
-
-  const el = document.createElement('audio');
-  el.src = AUDIO_DIR + t.file + '.mp3';
-  el.loop = true;
-  el.preload = 'auto';
-  el.volume = 0;
-  el.addEventListener('error', () => { t.dead = true; t.el = null; el.remove(); });
-  trackBox.appendChild(el);
-  t.el = el;
+    const off = (r.top + r.height / 2) - innerHeight / 2;
+    if (t.hold && off <= 0) return 0;
+    best = Math.min(best, Math.abs(off));
+  }
+  return best;
 }
 
-// Eased per second rather than per frame. Tied to frames, the same crossfade
-// ran at half speed on a 30fps phone and twice as fast on a 120Hz one.
-let audioLast = 0;
-const approach = (cur, want, rate, dt) => cur + (want - cur) * (1 - Math.exp(-rate * dt));
+function pickCurrent() {
+  let best = null, bd = Infinity;
+  for (const t of tracks) {
+    if (t.dead) continue;
+    const d = distance(t);
+    if (d < bd) { bd = d; best = t; }
+  }
+  if (!best) return current;
+  if (!current || current.dead) return best;
+  // A little stickiness at the halfway point, so hovering there doesn't flip
+  // between two songs.
+  return bd < distance(current) - gap * 0.08 ? best : current;
+}
+
+const shape = x => Math.sin(Math.min(1, Math.max(0, x)) * Math.PI / 2);  // equal-power curve
 
 function audioFrame(now) {
   audioRaf = 0;
   const dt = audioLast ? Math.min((now - audioLast) / 1000, 0.1) : 0.016;
   audioLast = now;
 
-  if (!soundOn && master < 0.001) {            // fully faded out: stop the loop
-    tracks.forEach(t => { if (t.el && !t.el.paused) t.el.pause(); });
-    audioLast = 0;
-    return;
-  }
-  master = approach(master, soundOn ? 1 : 0, 6, dt);
+  master += ((soundOn ? 1 : 0) - master) > 0 ? dt / MASTER_FADE : -dt / MASTER_FADE;
+  master = Math.min(1, Math.max(0, master));
 
   measureGap();
-  let total = 0;
-  for (const t of tracks) {
-    ensureLoaded(t);
-    t.target = t.dead ? 0 : Math.max(...t.anchors.map(a => weigh(a, t.hold)));
-    // Raised to a power before the weights are normalised, so the nearer
-    // chapter wins decisively instead of politely. Sharing the weights raw
-    // left the previous track at 0.42 when the next chapter was already three
-    // quarters of the way in — clearly audible under it. Cubed, the same
-    // point sits at 0.01, while the crossover at the exact midway mark is
-    // untouched, so the handover is still a crossfade and not a cut.
-    t.shaped = Math.pow(t.target, 3);
-    total += t.shaped;
-  }
+  current = pickCurrent();
 
+  let busy = master !== (soundOn ? 1 : 0);
   for (const t of tracks) {
-    // Equal power rather than equal amplitude: two tracks at half volume each
-    // sound quieter than one at full, so the handover would sag in the middle.
-    const want = total > 0 ? Math.sqrt(t.shaped / total) * master : 0;
-    t.gain = approach(t.gain, want, 7, dt);    // eased, so scroll jitter can't buzz
-    if (!t.el) continue;
-    if (t.gain > 0.004) {
-      t.el.volume = Math.min(1, t.gain);
+    const want = t === current ? 1 : 0;
+    if (t.level < want) t.level = Math.min(want, t.level + dt / FADE_IN);
+    else if (t.level > want) t.level = Math.max(want, t.level - dt / FADE_OUT);
+    if (t.level !== want) busy = true;
+
+    const g = shape(t.level) * shape(master);
+    if (!t.el) continue;                      // not unlocked yet: nothing to drive
+    if (t.node) t.node.gain.value = g; else t.el.volume = Math.min(1, g);
+
+    if (g > 0.001) {
       if (t.el.paused) t.el.play().catch(() => {});
     } else if (!t.el.paused) {
-      t.el.volume = 0;
       t.el.pause();
     }
   }
-  audioRaf = requestAnimationFrame(audioFrame);
+  if (busy) audioRaf = requestAnimationFrame(audioFrame);
+  else audioLast = 0;
 }
 function audioWake() { if (!audioRaf) audioRaf = requestAnimationFrame(audioFrame); }
 
 function setSound(on) {
+  if (on) unlock();                          // we're inside the tap here
   soundOn = on;
   soundBtn.setAttribute('aria-pressed', String(on));
   soundBtn.setAttribute('aria-label', on ? 'Turn the music off' : 'Turn the music on');
   soundHint.hidden = true;
-  remember(on ? 'on' : 'off');
   audioWake();
 }
-
 soundBtn.addEventListener('click', () => setSound(!soundOn));
+soundHint.addEventListener('click', () => setSound(true));
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__audio = { tracks, get ctx() { return actx; } };
 
-// --- starting up -----------------------------------------------------------
-// Try to start on our own; browsers will usually refuse until the guest has
-// interacted, and when they do we ask rather than stay silent.
-let armed = false;
-function arm() {
-  if (armed) return;
-  armed = true;
-  setSound(true);
-}
+// Show the control only if the music is really there. A HEAD request rather
+// than waiting on the <audio> element: iOS doesn't preload media, so its
+// "canplay" never fires before a tap and the button would never appear.
+fetch(AUDIO_DIR + 'hero.mp3', { method: 'HEAD' })
+  .then(r => { if (r.ok) { soundUI.hidden = false; soundHint.hidden = false; } })
+  .catch(() => {});
 
-// The whole control stays hidden until we know there is actually something to
-// play, so the page can go live before the music is finished without showing
-// guests a button that does nothing.
-const soundUI = document.getElementById('sound');
-const probe = document.createElement('audio');
-probe.src = AUDIO_DIR + 'hero.mp3';
-probe.volume = 0;
-
-if (recall() === 'off') {
-  armed = true;                                 // they muted it last time
-  probe.addEventListener('canplay', () => { soundUI.hidden = false; }, { once: true });
-  probe.load();
-} else {
-  probe.play().then(() => {
-    probe.pause(); probe.remove();
-    soundUI.hidden = false;
-    arm();                                      // autoplay allowed
-  }).catch(err => {
-    probe.remove();
-    // Two very different failures land here. NotAllowedError means the browser
-    // refused to autoplay and the guest can fix that by interacting — so ask.
-    // Anything else means the file is missing or won't decode, and inviting
-    // someone to tap for sound that does not exist is worse than saying
-    // nothing. That is also the state while the mp3s are still being cut.
-    if (err && err.name !== 'NotAllowedError') { armed = true; return; }
-    soundUI.hidden = false;
-    soundHint.hidden = false;                   // blocked: invite them in
-    // Any real gesture counts, including the Begin button and the first tap
-    // on a phone. A wheel scroll does not, which is exactly why the hint is
-    // there for anyone reading on a laptop.
-    ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
-      addEventListener(ev, arm, { once: true, passive: true }));
-  });
-}
-
-// keep volumes tracking the page while it moves
+// Follow the page while it moves.
 addEventListener('scroll', audioWake, { passive: true });
 addEventListener('resize', audioWake);
-addEventListener('visibilitychange', () => { if (!document.hidden) audioWake(); });
+
+// A tab in the background goes quiet; coming back picks up where it was. iOS
+// also suspends the audio context when the screen locks — any later tap
+// wakes it again.
+addEventListener('visibilitychange', () => {
+  if (document.hidden) { tracks.forEach(t => { if (t.el && !t.el.paused) t.el.pause(); }); return; }
+  if (actx && actx.state !== 'running') actx.resume().catch(() => {});
+  audioWake();
+});
+['touchend', 'click', 'keydown'].forEach(ev => addEventListener(ev, () => {
+  if (soundOn && actx && actx.state !== 'running') actx.resume().catch(() => {});
+}, { passive: true }));
+
 // ==================================================================== hearts
 // Guests press a heart onto the chapters they love. The first time, they're
 // asked once whether to sign with a name or stay anonymous; after that every
@@ -1604,6 +1788,7 @@ async function leaveHeart(ch, name) {
   if (name) d.names.push({ n: name, u: (heartStore && heartStore.uid) || 'me' });
   mine[ch] = { name };
   renderHearts();
+  burst(ch);
   b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed');
   const n = b.querySelector('.n'); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump');
 
@@ -1641,6 +1826,61 @@ function renderHearts() {
       (d.count ? ', ' + d.count + (d.count === 1 ? ' heart' : ' hearts') : ''));
   }
   if (likeDlg.open && !$id('ld-who').hidden) fillWho(openCh);
+}
+
+// ---- a little flock of hearts flying out from behind the print ----
+function burst(ch) {
+  if (reduced) return;
+  const b = heartBtns.find(x => x.dataset.ch === ch);
+  const plate = b && b.closest('.plate');
+  const layer = plate && plate.querySelector('.burst');
+  if (!layer) return;
+  const W = plate.offsetWidth, H = plate.offsetHeight;
+  const n = 12 + Math.floor(Math.random() * 5);
+  for (let k = 0; k < n; k++) {
+    const h = new Image();
+    h.src = 'assets/heart.webp'; h.alt = ''; h.draggable = false;
+    const size = 20 + Math.random() * 30;
+    h.style.width = h.style.height = size + 'px';
+    layer.append(h);
+    // Born just inside the edge of the print, so they appear from behind it
+    // almost at once, then drift up and out and fade.
+    const edge = Math.random();
+    const side = edge < .5 ? -1 : 1;
+    const x0 = (side < 0 ? W * (0.02 + Math.random() * 0.2) : W * (0.78 + Math.random() * 0.2)) - size / 2;
+    const y0 = H * (0.08 + Math.random() * 0.72) - size / 2;
+    const dx = side * (W * 0.18 + Math.random() * W * 0.42);
+    const dy = -(H * 0.16 + Math.random() * H * 0.4);
+    const r0 = (Math.random() - .5) * 40, r1 = r0 + side * (10 + Math.random() * 40);
+    const dur = 2300 + Math.random() * 1100;
+    const at = (f, sc, op, off) => ({ transform: `translate(${x0 + dx * f}px,${y0 + dy * f}px) rotate(${r0 + (r1 - r0) * f}deg) scale(${sc})`, opacity: op, offset: off });
+    const anim = h.animate([
+      at(0, .4, 0, 0), at(.18, 1, 1, .16), at(.62, .92, .9, .6), at(1, .78, 0, 1)
+    ], { duration: dur, delay: Math.random() * 320, easing: 'cubic-bezier(.3,.55,.4,1)', fill: 'both' });
+    anim.onfinish = () => h.remove();
+  }
+}
+
+// Double-tap (or double-click) the photograph to leave a heart, like a
+// photo app. Already hearted? It just sends the hearts flying again.
+function onDoubleTap(ch) {
+  const b = heartBtns.find(x => x.dataset.ch === ch);
+  if (!b || b.hidden) return;
+  if (isMine(ch)) { burst(ch); b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed'); return; }
+  if (!me) return openDialog(ch, 'setup');
+  leaveHeart(ch, me.name);
+}
+for (const b of heartBtns) {
+  const card = b.closest('.instax');
+  let lastT = 0, lastX = 0, lastY = 0;
+  card.addEventListener('pointerup', e => {
+    if (e.target.closest('.heart') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const now = performance.now();
+    if (now - lastT < 330 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 40) {
+      lastT = 0;
+      onDoubleTap(b.dataset.ch);
+    } else { lastT = now; lastX = e.clientX; lastY = e.clientY; }
+  });
 }
 
 // ---- wiring ----
