@@ -859,25 +859,30 @@
 
 <script>
 // ===================================================================== story
+// Bump this whenever a chapter photograph is replaced. The file names stay
+// the same, so without it browsers (and the local test server) keep showing
+// the copy they already have.
+const PHOTO_V = '2026-09-30b';
+
 const CHAPTERS = [
   { id:'2021-college',    yr:'2021',             t:'Where it started',
     c:'College of Engineering, Guindy. Friends first, and in no hurry about it.', n:2,
     alt:'Shiva and Meena sitting together on the steps of the red brick College of Engineering building in Guindy, books open on their laps, laughing at something between them.' },
   { id:'2022-two-cities', yr:'January\u00a02022',  t:'Two cities',
     c:'Him to Chennai, her to Bengaluru. The overnight train out of MGR\u00a0Central, and every excuse to be on it.', n:2,
-    alt:'Meena on the platform at Chennai MGR Central with the overnight train to Bengaluru behind her, bag in hand.' },
+    alt:'At Chennai MGR Central, Meena standing in the doorway of the overnight train to Bengaluru with her backpack and suitcase, smiling down at Shiva on the platform.' },
   { id:'2023-she-said-yes', yr:'2023',           t:'She said yes',
     c:'It took a while to ask. It took her less time to answer.', n:2,
     alt:'The two of them at a rooftop table at dusk, string lights and the city skyline behind, Shiva holding out a small bunch of flowers.' },
   { id:'2024-long-way',   yr:'2024',             t:'The long way round',
     c:'Calls that ran past midnight, video calls left on while we worked, weekends that turned up unannounced.', n:3,
-    alt:'Shiva and Meena walking through a lit shopping street in Bengaluru in the evening, drinks in hand and bags between them.' },
+    alt:'Three scenes: Meena laughing in surprise on a late-night video call, Shiva grinning on the other end of it, and the two of them walking through a lit Bengaluru shopping street that weekend, bubble tea and shopping bags in hand.' },
   { id:'2025-coming-home',yr:'2025',             t:'Coming home',
     c:'She moved back to Chennai. This time there were families to convince, and we did it side by side.', n:2,
     alt:'The two of them on a Chennai terrace in the afternoon, washing lines and palm trees behind, standing close and looking at each other.' },
   { id:'2026-yes',        yr:'2026',             t:'Both families said yes',
     c:'It wasn\u2019t easy. It was worth every difficult conversation.', n:2,
-    alt:'Shiva and Meena in traditional dress beside a lit brass lamp, a tray of offerings in front of them.' },
+    alt:'Shiva in a cream shirt and veshti and Meena in a green and gold silk saree with jasmine in her hair, standing together at home beside a lit brass lamp and trays of betel leaves, coconut and flowers.' },
   { id:'2026-engagement', yr:'18\u00a0June\u00a02026', t:'The engagement',
     c:'A ring, her left hand, and both families in one room at last.', n:2,
     alt:'At the engagement, Shiva slipping a ring onto Meena\u2019s left hand, both of them in garlands, she in a dark green and gold kanjivaram and he in a dusty rose kurta.' },
@@ -907,7 +912,7 @@ CHAPTERS.forEach((ch, i) => {
   relics.className = 'relics';
   for (let k = 1; k <= ch.n; k++) {
     const img = document.createElement('img');
-    img.src = 'assets/story/' + ch.id + '-relic' + k + '.png';
+    img.src = 'assets/story/' + ch.id + '-relic' + k + '.png?v=' + PHOTO_V;
     img.alt = '';
     img.loading = 'lazy';
     // A relic that hasn't been drawn yet simply isn't there, rather than
@@ -935,7 +940,7 @@ CHAPTERS.forEach((ch, i) => {
   const inside = ch.empty
     ? '<div class="shot blank" role="img" aria-label="An empty frame, waiting. ' + ch.empty + '">' +
         '<span aria-hidden="true">' + ch.empty + '</span></div>'
-    : '<div class="shot"><img src="assets/story/' + ch.id + '.jpg" width="760" height="760"' +
+    : '<div class="shot"><img src="assets/story/' + ch.id + '.jpg?v=' + PHOTO_V + '" width="760" height="760"' +
         ' alt="' + ch.alt.replace(/"/g, '&quot;') + '"' +
         (eager ? ' fetchpriority="high">' : ' loading="lazy" decoding="async">') + '</div>';
   plate.innerHTML =
@@ -1099,10 +1104,12 @@ hangs.forEach((h, i) => {
 // changes size. Every line gets its own star; they share one looping clock,
 // each lit only in its own slot, so the sequence can run forever without any
 // timers to keep in step.
-const STAR_SPEED = 190;      // px per second along a line
-const STAR_MIN = 0.7;        // seconds, even for a short line
-const STAR_GAP = 0.18;       // seconds between one line and the next
-const STAR_REST = 1.8;       // seconds of stillness before it starts over
+// Paced to reading, not to spectacle: roughly the speed an eye moves along a
+// line, so a guest can follow the star word by word.
+const STAR_SPEED = 105;      // px per second along a line
+const STAR_MIN = 1.4;        // seconds, even for a short line
+const STAR_GAP = 0.35;       // seconds between one line and the next
+const STAR_REST = 2.6;       // seconds of stillness before it starts over
 
 function textLines(el, base) {
   const rows = [];
@@ -1143,7 +1150,8 @@ function buildStars(i) {
     slots.push([t, t + d]);
     t += d + STAR_GAP;
   }
-  const total = t - STAR_GAP + STAR_REST;
+  st.pass = t - STAR_GAP;                         // one read-through, in seconds
+  const total = st.pass + STAR_REST;
   const f = x => Math.min(1, Math.max(0, x / total));
 
   lines.forEach((ln, k) => {
@@ -1162,7 +1170,7 @@ function buildStars(i) {
     const oa = f(a), ob = f(b);
     st.anims.push(head.animate([
       { offset: 0, transform: 'translateX(-100%)' },
-      { offset: oa, transform: 'translateX(-100%)', easing: 'cubic-bezier(.33,.1,.67,.95)' },
+      { offset: oa, transform: 'translateX(-100%)', easing: 'cubic-bezier(.25,.08,.6,.97)' },
       { offset: ob, transform: 'translateX(0)' },
       { offset: 1, transform: 'translateX(0)' }
     ], { duration: total * 1000, iterations: Infinity }));
@@ -1285,8 +1293,13 @@ async function play(from) {
     const c = chapters[autoIdx];
     const y = c.getBoundingClientRect().top + scrollY - (innerHeight - c.offsetHeight) / 2;
     if (!await easeTo(Math.max(0, y), 1500)) return;
-    { const k = autoIdx; setTimeout(() => { if (stars[k].built) restartStars(k); }, 300); }
-    await sleep(7200);        // long enough to read the caption and watch the star cross it
+    // Stay until the star has read the whole caption once (and never less
+    // than 7.2s), so the tour never moves on mid-sentence.
+    const k = autoIdx;
+    await sleep(300);
+    if (!autoPlaying) return;
+    startStars(k);
+    await sleep(Math.max(6900, ((stars[k].pass || 0) + 1.2) * 1000));
     if (!autoPlaying) return;
   }
   const w = document.getElementById('welcome');
