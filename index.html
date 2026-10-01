@@ -578,6 +578,42 @@
     100%{opacity:1;transform:rotate(11deg) scale(1)}
   }
 
+  /* ---- a nudge: when a guest lingers on a photo without touching anything,
+     the sticker beats gently and breathes a soft red glow, so they notice it
+     can be pressed. Stops the moment they move, scroll or tap. ---- */
+  /* Heart-shaped, not round: a soft blurred red heart breathing out from
+     behind the sticker, and a thin heart outline rippling away from it. Both
+     are drawn as tiny inline SVGs so their shape matches the sticker. */
+  .heart::before,.heart::after{
+    content:"";position:absolute;inset:-42%;z-index:-1;pointer-events:none;
+    background:no-repeat center/contain;opacity:0;transform:scale(.7);
+  }
+  .heart::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-20 -20 140 140'%3E%3Cdefs%3E%3Cfilter id='b' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='7'/%3E%3C/filter%3E%3CradialGradient id='g' cx='50%25' cy='45%25' r='60%25'%3E%3Cstop offset='0' stop-color='%23ff5a64'/%3E%3Cstop offset='.7' stop-color='%23e0223c'/%3E%3Cstop offset='1' stop-color='%23b5142e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M50 86 C24 68 6 50 10 31 C14 13 38 9 50 27 C62 9 86 13 90 31 C94 50 76 68 50 86 Z' fill='url(%23g)' filter='url(%23b)'/%3E%3C/svg%3E")}
+  .heart::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-20 -20 140 140'%3E%3Cdefs%3E%3Cfilter id='b' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2'/%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M50 86 C24 68 6 50 10 31 C14 13 38 9 50 27 C62 9 86 13 90 31 C94 50 76 68 50 86 Z' fill='none' stroke='%23ff6b74' stroke-width='3.5' filter='url(%23b)'/%3E%3C/svg%3E")}
+  .heart.nudge::before{animation:heartAura 1.8s ease-in-out infinite}
+  .heart.nudge::after{animation:heartRipple 1.8s ease-out infinite}
+  .heart.nudge img{animation:heartBeat 1.8s ease-in-out infinite}
+  @keyframes heartAura{
+    0%  {opacity:0;transform:scale(.75)}
+    30% {opacity:.95;transform:scale(1)}
+    100%{opacity:0;transform:scale(1.25)}
+  }
+  @keyframes heartRipple{
+    0%,12%{opacity:0;transform:scale(.8)}
+    30% {opacity:.9;transform:scale(.95)}
+    100%{opacity:0;transform:scale(1.55)}
+  }
+  @keyframes heartBeat{
+    0%,60%,100%{transform:scale(1)}
+    14%{transform:scale(1.1)}
+    28%{transform:scale(.98)}
+    42%{transform:scale(1.07)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .heart.nudge::before{animation:none;opacity:.85;transform:scale(1)}
+    .heart.nudge::after,.heart.nudge img{animation:none}
+  }
+
   /* ---- who has left one, on hover ---- */
   #like-tip{
     position:fixed;z-index:40;left:0;top:0;max-width:240px;
@@ -1895,6 +1931,49 @@ for (const b of heartBtns) {
     } else { lastT = now; lastX = e.clientX; lastY = e.clientY; }
   });
 }
+
+// ---- the idle nudge ----
+// After a few quiet seconds on a chapter, the heart for the photo in view
+// starts to glow — only if this guest hasn't hearted it yet. Any input
+// clears it and starts the count again. The guided tour's own scrolling
+// counts as quiet: someone watching the tour is exactly who should see it.
+const NUDGE_AFTER = 3500;
+let nudgeTimer = 0, nudged = null;
+function clearNudge() {
+  if (nudged) { nudged.classList.remove('nudge'); nudged = null; }
+}
+function chapterInView() {
+  let best = null, bd = Infinity;
+  for (const b of heartBtns) {
+    if (b.hidden) continue;
+    const r = b.closest('.plate').getBoundingClientRect();
+    if (r.bottom < innerHeight * 0.15 || r.top > innerHeight * 0.85) continue;
+    const d = Math.abs(r.top + r.height / 2 - innerHeight / 2);
+    if (d < bd) { bd = d; best = b; }
+  }
+  return best;
+}
+function armNudge() {
+  clearTimeout(nudgeTimer);
+  nudgeTimer = setTimeout(() => {
+    if (document.hidden || (likeDlg && likeDlg.open)) return armNudge();
+    const b = chapterInView();
+    if (b && !isMine(b.dataset.ch) && b.closest('.chapter').classList.contains('seen')) {
+      clearNudge(); nudged = b; b.classList.add('nudge');
+    } else armNudge();
+  }, NUDGE_AFTER);
+}
+function onActivity(e) {
+  // the tour scrolls the page itself; that isn't the guest doing anything
+  if (e.type === 'scroll' && typeof autoPlaying !== 'undefined' && autoPlaying) {
+    if (nudged && nudged !== chapterInView()) clearNudge();
+    return armNudge();
+  }
+  clearNudge(); armNudge();
+}
+['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(ev =>
+  addEventListener(ev, onActivity, { passive: true }));
+armNudge();
 
 // ---- wiring ----
 for (const b of heartBtns) {
